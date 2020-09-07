@@ -4,12 +4,12 @@ import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
 import lombok.Getter;
 
-public class LGGameJoinEvent extends LGEvent{
-	public LGGameJoinEvent(LGGame game, LGPlayer player) {
-		super(game);
-		this.player = player;
-	}
-
-	@Getter
+public class LGGameJoinEvent extends LGEvent {
+    @Getter
     final LGPlayer player;
+
+    public LGGameJoinEvent(LGGame game, LGPlayer player) {
+        super(game);
+        this.player = player;
+    }
 }

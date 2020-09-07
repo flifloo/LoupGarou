@@ -1,6 +1,7 @@
 package fr.leomelki.loupgarou.listeners;
 
 import fr.leomelki.loupgarou.MainLg;
+import fr.leomelki.loupgarou.classes.LGPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,61 +16,69 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
-import fr.leomelki.loupgarou.classes.LGPlayer;
+public class CancelListener implements Listener {
+    private final MainLg plugin;
 
-public class CancelListener implements Listener{
-	private final MainLg plugin;
+    public CancelListener(MainLg mainLg) {
+        this.plugin = mainLg;
+    }
 
-	public CancelListener (MainLg mainLg) {
-		this.plugin = mainLg;
-	}
-	@EventHandler
-	public void onPluie(WeatherChangeEvent e) {
-		e.setCancelled(true);
-	}
-	@EventHandler
-	public void onMove(PlayerMoveEvent e) {
-		LGPlayer lgp = LGPlayer.thePlayer(plugin, e.getPlayer());
-		if(lgp.getGame() != null && lgp.getGame().isStarted() && e.getFrom().distanceSquared(e.getTo()) > 0.001)
-			e.setTo(e.getFrom());
-	}
-	@EventHandler
-	public void onDamage(EntityDamageEvent e) {
-		e.setCancelled(true);
-	}
-	@EventHandler
-	public void onFood(FoodLevelChangeEvent e) {
-		e.setFoodLevel(6);
-	}
-	@EventHandler
-	public void onRespawn(PlayerRespawnEvent e) {
-		e.setRespawnLocation(e.getPlayer().getLocation());
-	}
-	@EventHandler
-	public void onRespawn(PlayerDeathEvent e) {
-		e.setDeathMessage("");
-		e.setKeepInventory(true);
-	}
-/*	@EventHandler
-	public void onAchievement(PlayerAchievementAwardedEvent e) {
-		e.setCancelled(true);
-	}*/
-	@EventHandler
-	public void onEntitySpawn(EntitySpawnEvent e) {
-		e.setCancelled(true);
-	}
-	@EventHandler
-	public void onDrop(PlayerDropItemEvent e) {
-		e.setCancelled(true);
-	}
-	@EventHandler
-	public void onClickInventory(InventoryClickEvent e) {
-		if(LGPlayer.thePlayer(plugin, (Player)e.getWhoClicked()).getGame() != null)
-			e.setCancelled(true);
-	}
-	@EventHandler
-	public void onClickInventory(PlayerSwapHandItemsEvent e) {
-		if(LGPlayer.thePlayer(plugin, e.getPlayer()).getGame() != null)
-			e.setCancelled(true);
-	}
+    @EventHandler
+    public void onPluie(WeatherChangeEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        LGPlayer lgp = LGPlayer.thePlayer(plugin, e.getPlayer());
+        if (lgp.getGame() != null && lgp.getGame().isStarted() && e.getFrom().distanceSquared(e.getTo()) > 0.001)
+            e.setTo(e.getFrom());
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onFood(FoodLevelChangeEvent e) {
+        e.setFoodLevel(6);
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent e) {
+        e.setRespawnLocation(e.getPlayer().getLocation());
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerDeathEvent e) {
+        e.setDeathMessage("");
+        e.setKeepInventory(true);
+    }
+
+    /*	@EventHandler
+        public void onAchievement(PlayerAchievementAwardedEvent e) {
+            e.setCancelled(true);
+        }*/
+    @EventHandler
+    public void onEntitySpawn(EntitySpawnEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onClickInventory(InventoryClickEvent e) {
+        if (LGPlayer.thePlayer(plugin, (Player) e.getWhoClicked()).getGame() != null)
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onClickInventory(PlayerSwapHandItemsEvent e) {
+        if (LGPlayer.thePlayer(plugin, e.getPlayer()).getGame() != null)
+            e.setCancelled(true);
+    }
 }

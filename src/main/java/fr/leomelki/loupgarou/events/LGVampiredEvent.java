@@ -5,12 +5,15 @@ import fr.leomelki.loupgarou.classes.LGPlayer;
 import lombok.Getter;
 import lombok.Setter;
 
-public class LGVampiredEvent extends LGEvent{
-	public LGVampiredEvent(LGGame game, LGPlayer player) {
-		super(game);
-		this.player = player;
-	}
-	
-	@Getter @Setter private boolean immuned, protect;
-	@Getter @Setter private LGPlayer player;
+public class LGVampiredEvent extends LGEvent {
+    @Getter
+    @Setter
+    private boolean immuned, protect;
+    @Getter
+    @Setter
+    private LGPlayer player;
+    public LGVampiredEvent(LGGame game, LGPlayer player) {
+        super(game);
+        this.player = player;
+    }
 }
