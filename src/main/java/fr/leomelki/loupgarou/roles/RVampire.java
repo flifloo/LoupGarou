@@ -7,11 +7,8 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.inventory.ItemStack;
 
-import fr.leomelki.com.comphenix.packetwrapper.WrapperPlayServerScoreboardTeam;
 import fr.leomelki.loupgarou.classes.LGCustomItems;
-import fr.leomelki.loupgarou.classes.LGCustomSkin;
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
 import fr.leomelki.loupgarou.classes.LGVote;
@@ -19,12 +16,9 @@ import fr.leomelki.loupgarou.classes.LGWinType;
 import fr.leomelki.loupgarou.classes.LGCustomItems.LGCustomItemsConstraints;
 import fr.leomelki.loupgarou.classes.chat.LGChat;
 import fr.leomelki.loupgarou.events.LGCustomItemChangeEvent;
-import fr.leomelki.loupgarou.events.LGDayEndEvent;
 import fr.leomelki.loupgarou.events.LGGameEndEvent;
 import fr.leomelki.loupgarou.events.LGNightEndEvent;
-import fr.leomelki.loupgarou.events.LGNightStart;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
-import fr.leomelki.loupgarou.events.LGSkinLoadEvent;
 import fr.leomelki.loupgarou.events.LGUpdatePrefixEvent;
 import fr.leomelki.loupgarou.events.LGVampiredEvent;
 import lombok.Getter;
@@ -82,9 +76,7 @@ public class RVampire extends Role{
 		return nextCanInfect < getGame().getNight() && super.hasPlayersLeft();
 	}
 	
-	@Getter private final LGChat chat = new LGChat((sender, message) -> {
-		return "§5"+sender.getName()+" §6» §f"+message;
-	});
+	@Getter private final LGChat chat = new LGChat((sender, message) -> "§5"+sender.getName()+" §6» §f"+message);
 	int nextCanInfect = 0;
 	LGVote vote;
 	@Override
@@ -95,9 +87,7 @@ public class RVampire extends Role{
 	}
 
 	public void onNightTurn(Runnable callback) {
-		vote = new LGVote(getTimeout(), getTimeout()/3, getGame(), false, false, (player, secondsLeft)-> {
-			return !getPlayers().contains(player) ? "§6C'est au tour "+getFriendlyName()+" §6(§e"+secondsLeft+" s§6)" : player.getCache().has("vote") ? "§l§9Vous votez pour §c§l"+player.getCache().<LGPlayer>get("vote").getName() : "§6Il vous reste §e"+secondsLeft+" seconde"+(secondsLeft > 1 ? "s" : "")+"§6 pour voter";
-		});
+		vote = new LGVote(getTimeout(), getTimeout()/3, getGame(), false, false, (player, secondsLeft)-> !getPlayers().contains(player) ? "§6C'est au tour "+getFriendlyName()+" §6(§e"+secondsLeft+" s§6)" : player.getCache().has("vote") ? "§l§9Vous votez pour §c§l"+player.getCache().<LGPlayer>get("vote").getName() : "§6Il vous reste §e"+secondsLeft+" seconde"+(secondsLeft > 1 ? "s" : "")+"§6 pour voter");
 		for(LGPlayer lgp : getGame().getAlive())
 			if(lgp.getRoleType() == RoleType.VAMPIRE)
 				lgp.showView();
@@ -132,7 +122,7 @@ public class RVampire extends Role{
 						equal = true;
 				if(equal) {
 					choosen = null;
-					ArrayList<LGPlayer> choosable = new ArrayList<LGPlayer>();
+					ArrayList<LGPlayer> choosable = new ArrayList<>();
 					for(Entry<LGPlayer, List<LGPlayer>> entry : vote.getVotes().entrySet())
 						if(entry.getValue().size() == max && entry.getKey().getRoleType() != RoleType.VAMPIRE)
 							choosable.add(entry.getKey());

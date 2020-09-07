@@ -1,19 +1,8 @@
 package fr.leomelki.loupgarou.roles;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
-import fr.leomelki.loupgarou.classes.LGWinType;
-import fr.leomelki.loupgarou.events.LGEndCheckEvent;
-import fr.leomelki.loupgarou.events.LGGameEndEvent;
-import fr.leomelki.loupgarou.events.LGNightEndEvent;
-import fr.leomelki.loupgarou.events.LGNightPlayerPreKilledEvent;
-import fr.leomelki.loupgarou.events.LGPyromaneGasoilEvent;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
-import fr.leomelki.loupgarou.events.LGRoleTurnEndEvent;
 
 public class RChasseurDeVampire extends Role{
 	public RChasseurDeVampire(LGGame game) {
@@ -67,24 +56,21 @@ public class RChasseurDeVampire extends Role{
 	protected void onNightTurn(LGPlayer player, Runnable callback) {
 		player.showView();
 		
-		player.choose(new LGChooseCallback() {
-			@Override
-			public void callback(LGPlayer choosen) {
-				if(choosen != null && choosen != player) {
-				//	player.sendMessage("§6Tu as choisi de rendre visite à §7§l"+choosen.getName()+"§6.");
-					if(choosen.getCache().getBoolean("vampire") || choosen.getRole() instanceof RVampire) {
-						getGame().kill(choosen, Reason.CHASSEUR_DE_VAMPIRE);
-						player.sendMessage("§7§l"+choosen.getName()+"§6 est un §5§lVampire§6, à l'attaque.");
-						player.sendActionBarMessage("§e§l"+choosen.getName()+"§6 va mourir");
-					} else {
-						player.sendMessage("§7§l"+choosen.getName()+"§6 n'est pas un §5§lVampire§6...");
-						player.sendActionBarMessage("§e§l"+choosen.getName()+"§6 n'est pas un §5§lVampire");
-					}
-					
-					player.stopChoosing();
-					player.hideView();
-					callback.run();
+		player.choose(choosen -> {
+			if(choosen != null && choosen != player) {
+			//	player.sendMessage("§6Tu as choisi de rendre visite à §7§l"+choosen.getName()+"§6.");
+				if(choosen.getCache().getBoolean("vampire") || choosen.getRole() instanceof RVampire) {
+					getGame().kill(choosen, Reason.CHASSEUR_DE_VAMPIRE);
+					player.sendMessage("§7§l"+choosen.getName()+"§6 est un §5§lVampire§6, à l'attaque.");
+					player.sendActionBarMessage("§e§l"+choosen.getName()+"§6 va mourir");
+				} else {
+					player.sendMessage("§7§l"+choosen.getName()+"§6 n'est pas un §5§lVampire§6...");
+					player.sendActionBarMessage("§e§l"+choosen.getName()+"§6 n'est pas un §5§lVampire");
 				}
+
+				player.stopChoosing();
+				player.hideView();
+				callback.run();
 			}
 		});
 	}

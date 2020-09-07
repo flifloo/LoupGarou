@@ -1,6 +1,7 @@
 package fr.leomelki.loupgarou.roles;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -19,7 +20,7 @@ import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
 
 public class RChienLoup extends Role{
-	static ItemStack[] items = new ItemStack[9];
+	static final ItemStack[] items = new ItemStack[9];
 	static {
 		items[3] = new ItemStack(Material.GOLDEN_APPLE);
 		ItemMeta meta = items[3].getItemMeta();
@@ -30,7 +31,7 @@ public class RChienLoup extends Role{
 		items[5] = new ItemStack(Material.ROTTEN_FLESH);
 		meta = items[5].getItemMeta();
 		meta.setDisplayName("§cDevenir Loup-Garou");
-		meta.setLore(Arrays.asList("§cVous rejoindrez le camp des §c§lLoups"));
+		meta.setLore(Collections.singletonList("§cVous rejoindrez le camp des §c§lLoups"));
 		items[5].setItemMeta(meta);
 	}
 
@@ -122,7 +123,7 @@ public class RChienLoup extends Role{
 	public void onInventoryClick(InventoryClickEvent e) {
 		ItemStack item = e.getCurrentItem();
 		Player player = (Player)e.getWhoClicked();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 			
 		if(lgp.getRole() != this || item == null || item.getItemMeta() == null)return;
 
@@ -160,7 +161,7 @@ public class RChienLoup extends Role{
 	@EventHandler
 	public void onQuitInventory(InventoryCloseEvent e) {
 		if(e.getInventory() instanceof CraftInventoryCustom) {
-			LGPlayer player = LGPlayer.thePlayer((Player)e.getPlayer());
+			LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), (Player)e.getPlayer());
 			if(player.getRole() == this && inMenu) {
 				new BukkitRunnable() {
 					

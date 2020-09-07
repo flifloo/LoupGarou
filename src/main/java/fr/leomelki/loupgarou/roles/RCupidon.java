@@ -26,7 +26,6 @@ import fr.leomelki.com.comphenix.packetwrapper.WrapperPlayServerSpawnEntityLivin
 import fr.leomelki.loupgarou.MainLg;
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
 import fr.leomelki.loupgarou.classes.LGWinType;
 import fr.leomelki.loupgarou.events.LGEndCheckEvent;
 import fr.leomelki.loupgarou.events.LGGameEndEvent;
@@ -85,34 +84,31 @@ public class RCupidon extends Role{
 	protected void onNightTurn(LGPlayer player, Runnable callback) {
 		player.showView();
 		
-		player.choose(new LGChooseCallback() {
-			@Override
-			public void callback(LGPlayer choosen) {
-				if(choosen != null) {
-					if(player.getCache().has("cupidon_first")) {
-						LGPlayer first = player.getCache().remove("cupidon_first");
-						if(first == choosen) {
-							int entityId = Integer.MAX_VALUE-choosen.getPlayer().getEntityId();
-							WrapperPlayServerEntityDestroy destroy = new WrapperPlayServerEntityDestroy();
-							destroy.setEntityIds(new int[] {entityId});
-							destroy.sendPacket(player.getPlayer());
-						} else {
-						//	sendHead(player, choosen);
-							int entityId = Integer.MAX_VALUE-first.getPlayer().getEntityId();
-							WrapperPlayServerEntityDestroy destroy = new WrapperPlayServerEntityDestroy();
-							destroy.setEntityIds(new int[] {entityId});
-							destroy.sendPacket(player.getPlayer());
-							
-							setInLove(first, choosen);
-							player.sendMessage("§7§l"+first.getName()+"§9 et §7§l"+choosen.getName()+"§9 sont désormais follement amoureux.");
-							player.stopChoosing();
-							player.hideView();
-							callback.run();
-						}
+		player.choose(choosen -> {
+			if(choosen != null) {
+				if(player.getCache().has("cupidon_first")) {
+					LGPlayer first = player.getCache().remove("cupidon_first");
+					if(first == choosen) {
+						int entityId = Integer.MAX_VALUE-choosen.getPlayer().getEntityId();
+						WrapperPlayServerEntityDestroy destroy = new WrapperPlayServerEntityDestroy();
+						destroy.setEntityIds(new int[] {entityId});
+						destroy.sendPacket(player.getPlayer());
 					} else {
-						sendHead(player, choosen);
-						player.getCache().set("cupidon_first", choosen);
+					//	sendHead(player, choosen);
+						int entityId = Integer.MAX_VALUE-first.getPlayer().getEntityId();
+						WrapperPlayServerEntityDestroy destroy = new WrapperPlayServerEntityDestroy();
+						destroy.setEntityIds(new int[] {entityId});
+						destroy.sendPacket(player.getPlayer());
+
+						setInLove(first, choosen);
+						player.sendMessage("§7§l"+first.getName()+"§9 et §7§l"+choosen.getName()+"§9 sont désormais follement amoureux.");
+						player.stopChoosing();
+						player.hideView();
+						callback.run();
 					}
+				} else {
+					sendHead(player, choosen);
+					player.getCache().set("cupidon_first", choosen);
 				}
 			}
 		});
@@ -134,8 +130,8 @@ public class RCupidon extends Role{
 		player2.updatePrefix();
 	}
 
-	WrappedDataWatcherObject invisible = new WrappedDataWatcherObject(0, WrappedDataWatcher.Registry.get(Byte.class)),
-							 noGravity = new WrappedDataWatcherObject(5, WrappedDataWatcher.Registry.get(Boolean.class));
+	final WrappedDataWatcherObject invisible = new WrappedDataWatcherObject(0, WrappedDataWatcher.Registry.get(Byte.class));
+	final WrappedDataWatcherObject noGravity = new WrappedDataWatcherObject(5, WrappedDataWatcher.Registry.get(Boolean.class));
 	protected void sendHead(LGPlayer to, LGPlayer ofWho) {
 		int entityId = Integer.MAX_VALUE-ofWho.getPlayer().getEntityId();
 		WrapperPlayServerSpawnEntityLiving spawn = new WrapperPlayServerSpawnEntityLiving();
@@ -207,7 +203,7 @@ public class RCupidon extends Role{
 	public void onGameEnd(LGGameEndEvent e) {
 		if(e.getGame() == getGame()) {
 			WrapperPlayServerEntityDestroy destroy = new WrapperPlayServerEntityDestroy();
-			ArrayList<Integer> ids = new ArrayList<Integer>();
+			ArrayList<Integer> ids = new ArrayList<>();
 			for(LGPlayer lgp : getGame().getInGame())
 				ids.add(Integer.MAX_VALUE-lgp.getPlayer().getEntityId());
 			int[] intList = new int[ids.size()];
@@ -237,7 +233,7 @@ public class RCupidon extends Role{
 	@EventHandler
 	public void onEndCheck(LGEndCheckEvent e) {
 		if(e.getGame() == getGame()) {
-			ArrayList<LGPlayer> winners = new ArrayList<LGPlayer>();
+			ArrayList<LGPlayer> winners = new ArrayList<>();
 			for(LGPlayer lgp : getGame().getAlive())
 				if(lgp.getRoleWinType() != RoleWinType.NONE)
 					winners.add(lgp);
@@ -253,7 +249,7 @@ public class RCupidon extends Role{
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onChat(AsyncPlayerChatEvent e) {
-		LGPlayer player = LGPlayer.thePlayer(e.getPlayer());
+		LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), e.getPlayer());
 		if(player.getGame() == getGame()) {
 			if(e.getMessage().startsWith("!")) {
 				if(player.getCache().has("inlove")){

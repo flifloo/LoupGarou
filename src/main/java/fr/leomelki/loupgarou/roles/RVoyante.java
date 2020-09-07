@@ -2,7 +2,6 @@ package fr.leomelki.loupgarou.roles;
 
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
 
 public class RVoyante extends Role{
 	public RVoyante(LGGame game) {
@@ -50,17 +49,14 @@ public class RVoyante extends Role{
 	protected void onNightTurn(LGPlayer player, Runnable callback) {
 		player.showView();
 		
-		player.choose(new LGChooseCallback() {
-			@Override
-			public void callback(LGPlayer choosen) {
-				if(choosen != null && choosen != player) {
-					//player.sendTitle("§6Vous avez regardé un rôle", "§e§l"+choosen.getName()+"§6§l est §e§l"+choosen.getRole().getName(), 5*20);
-					player.sendActionBarMessage("§e§l"+choosen.getName()+"§6 est §e§l"+choosen.getRole().getName());
-					player.sendMessage("§6Tu découvres que §7§l"+choosen.getName()+"§6 est "+choosen.getRole().getName()+"§6.");
-					player.stopChoosing();
-					player.hideView();
-					callback.run();
-				}
+		player.choose(choosen -> {
+			if(choosen != null && choosen != player) {
+				//player.sendTitle("§6Vous avez regardé un rôle", "§e§l"+choosen.getName()+"§6§l est §e§l"+choosen.getRole().getName(), 5*20);
+				player.sendActionBarMessage("§e§l"+choosen.getName()+"§6 est §e§l"+choosen.getRole().getName());
+				player.sendMessage("§6Tu découvres que §7§l"+choosen.getName()+"§6 est "+choosen.getRole().getName()+"§6.");
+				player.stopChoosing();
+				player.hideView();
+				callback.run();
 			}
 		});
 	}

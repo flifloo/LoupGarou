@@ -1,12 +1,12 @@
 package fr.leomelki.loupgarou.roles;
 
-import java.util.Comparator;
-
 import org.bukkit.potion.PotionEffectType;
 
 import fr.leomelki.loupgarou.classes.LGCustomItems;
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
+
+import java.util.Comparator;
 
 public class REnfantSauvageLG extends Role{
 	public REnfantSauvageLG(LGGame game) {
@@ -71,12 +71,7 @@ public class REnfantSauvageLG extends Role{
 		if(lgRole == null) {
 			getGame().getRoles().add(lgRole = new RLoupGarou(getGame()));
 
-			getGame().getRoles().sort(new Comparator<Role>() {
-				@Override
-				public int compare(Role role1, Role role2) {
-					return role1.getTurnOrder()-role2.getTurnOrder();
-				}
-			});
+			getGame().getRoles().sort(Comparator.comparingInt(Role::getTurnOrder));
 		}
 		
 		lgRole.join(player, false);

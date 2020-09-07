@@ -2,6 +2,7 @@ package fr.leomelki.loupgarou.roles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -23,7 +24,6 @@ import fr.leomelki.loupgarou.MainLg;
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
 import fr.leomelki.loupgarou.classes.LGWinType;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
 import fr.leomelki.loupgarou.events.LGEndCheckEvent;
 import fr.leomelki.loupgarou.events.LGGameEndEvent;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent;
@@ -31,13 +31,14 @@ import fr.leomelki.loupgarou.events.LGPyromaneGasoilEvent;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
 
 public class RPyromane extends Role{
-	static ItemStack[] items = new ItemStack[9];
-	static ItemStack cancel, nothing;
+	static final ItemStack[] items = new ItemStack[9];
+	static final ItemStack cancel;
+	static final ItemStack nothing;
 	static {
 		cancel = new ItemStack(Material.IRON_NUGGET);
 		ItemMeta meta = cancel.getItemMeta();
 		meta.setDisplayName("§7§lAnnuler");
-		meta.setLore(Arrays.asList("§8Rouvrir le menu"));
+		meta.setLore(Collections.singletonList("§8Rouvrir le menu"));
 		cancel.setItemMeta(meta);
 		nothing = new ItemStack(Material.IRON_NUGGET);
 		meta = nothing.getItemMeta();
@@ -53,7 +54,7 @@ public class RPyromane extends Role{
 		items[5] = new ItemStack(Material.LAVA_BUCKET);
 		meta = items[5].getItemMeta();
 		meta.setDisplayName("§c§lRecouvrir d'essence");
-		meta.setLore(Arrays.asList(
+		meta.setLore(Collections.singletonList(
 				"§8Recouvres deux joueurs d'essence"));
 		items[5].setItemMeta(meta);
 	}
@@ -111,7 +112,7 @@ public class RPyromane extends Role{
 		inMenu = true;
 		Inventory inventory = Bukkit.createInventory(null, 9, "§7Que veux-tu faire ?");
 		ItemStack[] content = items.clone();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 		if(!lgp.getCache().has("pyromane_essence"))
 			lgp.getCache().set("pyromane_essence", new ArrayList<>());
 		if(lgp.getCache().<List<LGPlayer>>get("pyromane_essence").size() == 0)
@@ -159,7 +160,7 @@ public class RPyromane extends Role{
 	public void onInventoryClick(InventoryClickEvent e) {
 		ItemStack item = e.getCurrentItem();
 		Player player = (Player)e.getWhoClicked();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 			
 		if(lgp.getRole() != this || item == null || item.getItemMeta() == null)return;
 		if(item.getItemMeta().getDisplayName().equals(nothing.getItemMeta().getDisplayName())) {
@@ -195,31 +196,38 @@ public class RPyromane extends Role{
 			held.setSlot(0);
 			held.sendPacket(player);
 			lgp.sendMessage("§6Choisis deux joueurs à recouvrir de gasoil.");
-			lgp.choose(new LGChooseCallback() {
-				@Override
-				public void callback(LGPlayer choosen) {
-					if(choosen != null) {
-						if(choosen == first) {
-							lgp.sendMessage("§cTu as déjà versé du gasoil sur §7§l"+choosen.getName()+"§6.");
-							return;
+			lgp.choose(choosen -> {
+				if(choosen != null) {
+					if(choosen == first) {
+						lgp.sendMessage("§cTu as déjà versé du gasoil sur §7§l"+choosen.getName()+"§6.");
+						return;
+					}
+					List<LGPlayer> liste = lgp.getCache().get("pyromane_essence");
+					if(liste.contains(choosen)) {
+						lgp.sendMessage("§7§l"+choosen.getName()+"§c est déjà recouvert de gasoil.");
+						return;
+					}
+					if(first == choosen) {
+						lgp.sendMessage("§cVous avez déjà sélectionné §7§l"+choosen.getName()+"§c.");
+						return;
+					}
+					player.getInventory().setItem(8, null);
+					player.updateInventory();
+					lgp.sendMessage("§6Tu as versé du gasoil sur §7§l"+choosen.getName()+"§6.");
+					lgp.sendActionBarMessage("§6§7§l"+choosen.getName()+"§6 est recouvert de gasoil");
+					if(first != null || getGame().getAlive().size() == 2) {
+						lgp.hideView();
+						lgp.stopChoosing();
+						LGPyromaneGasoilEvent event = new LGPyromaneGasoilEvent(getGame(), choosen);
+						Bukkit.getPluginManager().callEvent(event);
+						if(event.isCancelled())
+							lgp.sendMessage("§7§l"+event.getPlayer().getName()+"§c est immunisée.");
+						else {
+							event.getPlayer().sendMessage("§6Tu es recouvert de gasoil...");
+							liste.add(event.getPlayer());
 						}
-						List<LGPlayer> liste = lgp.getCache().get("pyromane_essence");
-						if(liste.contains(choosen)) {
-							lgp.sendMessage("§7§l"+choosen.getName()+"§c est déjà recouvert de gasoil.");
-							return;
-						}
-						if(first == choosen) {
-							lgp.sendMessage("§cVous avez déjà sélectionné §7§l"+choosen.getName()+"§c.");
-							return;
-						}
-						player.getInventory().setItem(8, null);
-						player.updateInventory();
-						lgp.sendMessage("§6Tu as versé du gasoil sur §7§l"+choosen.getName()+"§6.");
-						lgp.sendActionBarMessage("§6§7§l"+choosen.getName()+"§6 est recouvert de gasoil");
-						if(first != null || getGame().getAlive().size() == 2) {
-							lgp.hideView();
-							lgp.stopChoosing();
-							LGPyromaneGasoilEvent event = new LGPyromaneGasoilEvent(getGame(), choosen);
+						if(first != null) {
+							event = new LGPyromaneGasoilEvent(getGame(), first);
 							Bukkit.getPluginManager().callEvent(event);
 							if(event.isCancelled())
 								lgp.sendMessage("§7§l"+event.getPlayer().getName()+"§c est immunisée.");
@@ -227,21 +235,11 @@ public class RPyromane extends Role{
 								event.getPlayer().sendMessage("§6Tu es recouvert de gasoil...");
 								liste.add(event.getPlayer());
 							}
-							if(first != null) {
-								event = new LGPyromaneGasoilEvent(getGame(), first);
-								Bukkit.getPluginManager().callEvent(event);
-								if(event.isCancelled())
-									lgp.sendMessage("§7§l"+event.getPlayer().getName()+"§c est immunisée.");
-								else {
-									event.getPlayer().sendMessage("§6Tu es recouvert de gasoil...");
-									liste.add(event.getPlayer());
-								}
-							}
-							callback.run();
-						} else {
-							lgp.sendMessage("§6Choisis un deuxième joueur à recouvrir de gasoil.");
-							first = choosen;
 						}
+						callback.run();
+					} else {
+						lgp.sendMessage("§6Choisis un deuxième joueur à recouvrir de gasoil.");
+						first = choosen;
 					}
 				}
 			}, lgp);
@@ -250,7 +248,7 @@ public class RPyromane extends Role{
 	@EventHandler
 	public void onClick(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 		if(lgp.getRole() == this) {
 			if(e.getItem() != null && e.getItem().hasItemMeta() && e.getItem().getItemMeta().getDisplayName().equals(cancel.getItemMeta().getDisplayName())) {
 				e.setCancelled(true);
@@ -274,7 +272,7 @@ public class RPyromane extends Role{
 	@EventHandler
 	public void onQuitInventory(InventoryCloseEvent e) {
 		if(e.getInventory() instanceof CraftInventoryCustom) {
-			LGPlayer player = LGPlayer.thePlayer((Player)e.getPlayer());
+			LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), (Player)e.getPlayer());
 			if(player.getRole() == this && inMenu) {
 				new BukkitRunnable() {
 					

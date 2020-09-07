@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class LGChat {
-	@Getter private final HashMap<LGPlayer, LGChatCallback> viewers = new HashMap<LGPlayer, LGChatCallback>();
+	@Getter private final HashMap<LGPlayer, LGChatCallback> viewers = new HashMap<>();
 	@Getter private final LGChatCallback defaultCallback;
 	
 	public interface LGChatCallback{

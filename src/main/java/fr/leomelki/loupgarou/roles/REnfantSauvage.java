@@ -7,9 +7,7 @@ import org.bukkit.event.EventPriority;
 
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent;
-import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
 
 public class REnfantSauvage extends Role{
 	public REnfantSauvage(LGGame game) {
@@ -63,20 +61,16 @@ public class REnfantSauvage extends Role{
 	protected void onNightTurn(LGPlayer player, Runnable callback) {
 		player.showView();
 		player.sendMessage("§6Choisissez votre modèle.");
-		player.choose(new LGChooseCallback() {
-			
-			@Override
-			public void callback(LGPlayer choosen) {
-				if(choosen != null) {
-					player.stopChoosing();
-					player.sendMessage("§6Si §7§l"+choosen.getName()+"§6 meurt, tu deviendras §c§lLoup-Garou§6.");
-					player.sendActionBarMessage("§7§l"+choosen.getName()+"§6 est ton modèle");
-					player.getCache().set("enfant_svg", choosen);
-					choosen.getCache().set("enfant_svg_d", player);
-					getPlayers().remove(player);//Pour éviter qu'il puisse avoir plusieurs modèles
-					player.hideView();
-					callback.run();
-				}
+		player.choose(choosen -> {
+			if(choosen != null) {
+				player.stopChoosing();
+				player.sendMessage("§6Si §7§l"+choosen.getName()+"§6 meurt, tu deviendras §c§lLoup-Garou§6.");
+				player.sendActionBarMessage("§7§l"+choosen.getName()+"§6 est ton modèle");
+				player.getCache().set("enfant_svg", choosen);
+				choosen.getCache().set("enfant_svg_d", player);
+				getPlayers().remove(player);//Pour éviter qu'il puisse avoir plusieurs modèles
+				player.hideView();
+				callback.run();
 			}
 		}, player);
 	}

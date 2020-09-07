@@ -17,7 +17,7 @@ import lombok.Setter;
 
 public abstract class Role implements Listener{
 	@Getter @Setter private int waitedPlayers;
-	@Getter private final ArrayList<LGPlayer> players = new ArrayList<LGPlayer>();
+	@Getter private final ArrayList<LGPlayer> players = new ArrayList<>();
 	@Getter private final LGGame game;
 	
 	public Role(LGGame game) {
@@ -70,16 +70,12 @@ public abstract class Role implements Listener{
 							err.printStackTrace();
 						}
 						this.run();
-					}, (currentPlayer, secondsLeft)->{
-						return currentPlayer == player ? "§9§lC'est à ton tour !" : "§6C'est au tour "+getFriendlyName()+" §6(§e"+secondsLeft+" s§6)";
-					});
+					}, (currentPlayer, secondsLeft)-> currentPlayer == player ? "§9§lC'est à ton tour !" : "§6C'est au tour "+getFriendlyName()+" §6(§e"+secondsLeft+" s§6)");
 					player.sendMessage("§6"+getTask());
 				//	player.sendTitle("§6C'est à vous de jouer", "§a"+getTask(), 100);
 					onNightTurn(player, this);
 				} else {
-					getGame().wait(getTimeout(), ()->{}, (currentPlayer, secondsLeft)->{
-						return currentPlayer == player ? "§c§lTu ne peux pas jouer" : "§6C'est au tour "+getFriendlyName()+" §6(§e"+secondsLeft+" s§6)";
-					});
+					getGame().wait(getTimeout(), ()->{}, (currentPlayer, secondsLeft)-> currentPlayer == player ? "§c§lTu ne peux pas jouer" : "§6C'est au tour "+getFriendlyName()+" §6(§e"+secondsLeft+" s§6)");
 					Runnable run = this;
 					new BukkitRunnable() {
 						

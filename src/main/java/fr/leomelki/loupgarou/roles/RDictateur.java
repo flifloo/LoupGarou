@@ -2,6 +2,7 @@ package fr.leomelki.loupgarou.roles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 import org.bukkit.Bukkit;
@@ -35,7 +36,7 @@ public class RDictateur extends Role{
 		items[3] = new ItemStack(Material.IRON_NUGGET);
 		ItemMeta meta = items[3].getItemMeta();
 		meta.setDisplayName("§7§lNe rien faire");
-		meta.setLore(Arrays.asList("§8Passez votre tour"));
+		meta.setLore(Collections.singletonList("§8Passez votre tour"));
 		items[3].setItemMeta(meta);
 		items[5] = new ItemStack(Material./*DIAMOND_SWORD*/GUNPOWDER);
 		meta = items[5].getItemMeta();
@@ -122,7 +123,7 @@ public class RDictateur extends Role{
 	public void onInventoryClick(InventoryClickEvent e) {
 		ItemStack item = e.getCurrentItem();
 		Player player = (Player)e.getWhoClicked();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 			
 		if(lgp.getRole() != this || item == null || item.getItemMeta() == null)return;
 
@@ -148,7 +149,7 @@ public class RDictateur extends Role{
 	@EventHandler
 	public void onClick(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		LGPlayer player = LGPlayer.thePlayer(p);
+		LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), p);
 		if(e.getItem() != null && e.getItem().getType() == Material.IRON_NUGGET && player.getRole() == this) {
 			getGame().cancelWait();
 			player.stopChoosing();
@@ -162,7 +163,7 @@ public class RDictateur extends Role{
 	@EventHandler
 	public void onQuitInventory(InventoryCloseEvent e) {
 		if(e.getInventory() instanceof CraftInventoryCustom) {
-			LGPlayer player = LGPlayer.thePlayer((Player)e.getPlayer());
+			LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), (Player)e.getPlayer());
 			if(player.getRole() == this && inMenu) {
 				new BukkitRunnable() {
 					
@@ -218,9 +219,7 @@ public class RDictateur extends Role{
 							lgp.getPlayer().getInventory().setItem(8, null);
 							lgp.getPlayer().updateInventory();
 							this.run();
-						}, (player, secondsLeft)->{
-							return lgp == player ? "§9§lC'est à ton tour !" : "§6Le Dictateur choisit sa victime (§e"+secondsLeft+" s§6)";
-						});
+						}, (player, secondsLeft)-> lgp == player ? "§9§lC'est à ton tour !" : "§6Le Dictateur choisit sa victime (§e"+secondsLeft+" s§6)");
 						lgp.choose((choosen)->{
 							if(choosen != null) {
 								getGame().cancelWait();

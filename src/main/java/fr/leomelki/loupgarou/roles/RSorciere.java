@@ -1,6 +1,6 @@
 package fr.leomelki.loupgarou.roles;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.leomelki.com.comphenix.packetwrapper.WrapperPlayServerHeldItemSlot;
@@ -30,7 +29,7 @@ public class RSorciere extends Role{
 		items[0] = new ItemStack(Material.PURPLE_DYE, 1);
 		ItemMeta meta = items[0].getItemMeta();
 		meta.setDisplayName("§a§lPotion de vie");
-		meta.setLore(Arrays.asList("§2Sauve la cible des §c§lLoups§2."));
+		meta.setLore(Collections.singletonList("§2Sauve la cible des §c§lLoups§2."));
 		items[0].setItemMeta(meta);
 		items[1] = new ItemStack(Material.IRON_NUGGET);
 		meta = items[1].getItemMeta();
@@ -39,7 +38,7 @@ public class RSorciere extends Role{
 		items[2] = new ItemStack(Material.LIGHT_BLUE_DYE, 1);
 		meta = items[2].getItemMeta();
 		meta.setDisplayName("§c§lPotion de mort");
-		meta.setLore(Arrays.asList("§cTue la personne de ton choix."));
+		meta.setLore(Collections.singletonList("§cTue la personne de ton choix."));
 		items[2].setItemMeta(meta);
 		cancel = new ItemStack(Material.IRON_NUGGET);
 		meta = cancel.getItemMeta();
@@ -140,7 +139,7 @@ public class RSorciere extends Role{
 	public void onInventoryClick(InventoryClickEvent e) {
 		ItemStack item = e.getCurrentItem();
 		Player player = (Player) e.getWhoClicked();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 
 		if (lgp.getRole() != this || item == null || item.getItemMeta() == null)
 			return;
@@ -178,7 +177,7 @@ public class RSorciere extends Role{
 	@EventHandler
 	public void onClick(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		LGPlayer player = LGPlayer.thePlayer(p);
+		LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), p);
 		if(e.getItem() != null && e.getItem().getType() == Material.IRON_NUGGET && player.getRole() == this) {
 			player.stopChoosing();
 			p.getInventory().setItem(8, null);
@@ -190,7 +189,7 @@ public class RSorciere extends Role{
 	@EventHandler
 	public void onQuitInventory(InventoryCloseEvent e) {
 		if(e.getInventory() instanceof CraftInventoryCustom) {
-			LGPlayer player = LGPlayer.thePlayer((Player)e.getPlayer());
+			LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), (Player)e.getPlayer());
 			if(player.getRole() == this && inMenu) {
 				new BukkitRunnable() {
 					

@@ -16,7 +16,11 @@ public class LGVoteLeaderChange extends LGEvent{
 		this.vote = vote;
 	}
 	
-	@Getter ArrayList<LGPlayer> latest, now;
-	@Getter LGVote vote;
+	@Getter
+    final ArrayList<LGPlayer> latest;
+    @Getter
+    final ArrayList<LGPlayer> now;
+	@Getter
+    final LGVote vote;
 
 }

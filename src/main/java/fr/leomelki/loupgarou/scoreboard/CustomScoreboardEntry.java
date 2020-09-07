@@ -1,6 +1,6 @@
 package fr.leomelki.loupgarou.scoreboard;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import com.comphenix.protocol.wrappers.EnumWrappers.ScoreboardAction;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
@@ -29,7 +29,7 @@ public class CustomScoreboardEntry {
 	public void show() {
 		if(prefix != null) {
 			WrapperPlayServerScoreboardTeam team = new WrapperPlayServerScoreboardTeam();
-			team.setPlayers(Arrays.asList(name));
+			team.setPlayers(Collections.singletonList(name));
 			team.setName(name);
 			team.setMode(0);
 			team.setPrefix(prefix);
@@ -77,7 +77,7 @@ public class CustomScoreboardEntry {
 				show();
 			else {
 				WrapperPlayServerScoreboardTeam team = new WrapperPlayServerScoreboardTeam();
-				team.setPlayers(Arrays.asList(name));
+				team.setPlayers(Collections.singletonList(name));
 				team.setName(name);
 				team.setMode(2);
 				team.setPrefix(prefix);

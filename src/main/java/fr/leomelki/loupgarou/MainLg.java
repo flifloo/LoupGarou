@@ -81,13 +81,12 @@ import fr.leomelki.loupgarou.roles.RVampire;
 import fr.leomelki.loupgarou.roles.RVillageois;
 import fr.leomelki.loupgarou.roles.RVoyante;
 import fr.leomelki.loupgarou.roles.Role;
-import fr.leomelki.loupgarou.utils.VariousUtils;
 import lombok.Getter;
 import lombok.Setter;
 
 public class MainLg extends JavaPlugin{
 	private static MainLg instance;
-	@Getter private final HashMap<String, Constructor<? extends Role>> roles = new HashMap<String, Constructor<? extends Role>>();
+	@Getter private final HashMap<String, Constructor<? extends Role>> roles = new HashMap<>();
 	@Getter private static final String prefix = ""/*"§7[§9Loup-Garou§7] "*/;
 	
 	@Getter @Setter private LGGame currentGame;//Because for now, only one game will be playable on one server (flemme)
@@ -104,10 +103,10 @@ public class MainLg extends JavaPlugin{
 			saveConfig();
 		}
 		loadConfig();
-		Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
-		Bukkit.getPluginManager().registerEvents(new CancelListener(), this);
-		Bukkit.getPluginManager().registerEvents(new VoteListener(), this);
-		Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+		Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
+		Bukkit.getPluginManager().registerEvents(new CancelListener(this), this);
+		Bukkit.getPluginManager().registerEvents(new VoteListener(this), this);
+		Bukkit.getPluginManager().registerEvents(new ChatListener(this), this);
 		Bukkit.getPluginManager().registerEvents(new LoupGarouListener(), this);
 		
 		for(Player player : Bukkit.getOnlinePlayers())
@@ -118,7 +117,7 @@ public class MainLg extends JavaPlugin{
 				@Override
 				public void onPacketSending(PacketEvent event) {
 					WrapperPlayServerUpdateTime time = new WrapperPlayServerUpdateTime(event.getPacket());
-					LGPlayer lgp = LGPlayer.thePlayer(event.getPlayer());
+					LGPlayer lgp = LGPlayer.thePlayer(instance, event.getPlayer());
 					if(lgp.getGame() != null && lgp.getGame().getTime() != time.getTimeOfDay())
 						event.setCancelled(true);
 				}
@@ -137,11 +136,11 @@ public class MainLg extends JavaPlugin{
 		protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
-				LGPlayer player = LGPlayer.thePlayer(event.getPlayer());
+				LGPlayer player = LGPlayer.thePlayer(instance, event.getPlayer());
 				WrapperPlayServerPlayerInfo info = new WrapperPlayServerPlayerInfo(event.getPacket());
-				ArrayList<PlayerInfoData> datas = new ArrayList<PlayerInfoData>();
+				ArrayList<PlayerInfoData> datas = new ArrayList<>();
 				for(PlayerInfoData data : info.getData()) {
-					LGPlayer lgp = LGPlayer.thePlayer(Bukkit.getPlayer(data.getProfile().getUUID()));
+					LGPlayer lgp = LGPlayer.thePlayer(instance, Bukkit.getPlayer(data.getProfile().getUUID()));
 					if(player.getGame() != null && player.getGame() == lgp.getGame()) {
 						LGUpdatePrefixEvent evt2 = new LGUpdatePrefixEvent(player.getGame(), lgp, player, "");
 						WrappedChatComponent displayName = data.getDisplayName();
@@ -169,7 +168,7 @@ public class MainLg extends JavaPlugin{
 		protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.UPDATE_HEALTH) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
-				LGPlayer player = LGPlayer.thePlayer(event.getPlayer());
+				LGPlayer player = LGPlayer.thePlayer(instance, event.getPlayer());
 				if(player.getGame() != null && player.getGame().isStarted()) {
 					WrapperPlayServerUpdateHealth health = new WrapperPlayServerUpdateHealth(event.getPacket());
 					health.setFood(6);
@@ -179,12 +178,12 @@ public class MainLg extends JavaPlugin{
 		protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.SCOREBOARD_TEAM) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
-				LGPlayer player = LGPlayer.thePlayer(event.getPlayer());
+				LGPlayer player = LGPlayer.thePlayer(instance, event.getPlayer());
 				WrapperPlayServerScoreboardTeam team = new WrapperPlayServerScoreboardTeam(event.getPacket());
 				team.setColor(ChatColor.WHITE);
 				Player other = Bukkit.getPlayer(team.getName());
 				if(other == null)return;
-				LGPlayer lgp = LGPlayer.thePlayer(other);
+				LGPlayer lgp = LGPlayer.thePlayer(instance, other);
 				if(player.getGame() != null && player.getGame() == lgp.getGame()) {
 					LGUpdatePrefixEvent evt2 = new LGUpdatePrefixEvent(player.getGame(), lgp, player, "");
 					Bukkit.getPluginManager().callEvent(evt2);
@@ -198,7 +197,7 @@ public class MainLg extends JavaPlugin{
 		protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.ENTITY_EQUIPMENT) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
-				LGPlayer player = LGPlayer.thePlayer(event.getPlayer());
+				LGPlayer player = LGPlayer.thePlayer(instance, event.getPlayer());
 				if(player.getGame() != null) {
 					WrapperPlayServerEntityEquipment equip = new WrapperPlayServerEntityEquipment(event.getPacket());
 					if(equip.getSlot() == ItemSlot.OFFHAND && equip.getEntityID() != player.getPlayer().getEntityId())
@@ -237,7 +236,7 @@ public class MainLg extends JavaPlugin{
 						sender.sendMessage("§4Erreur : §cLe joueur §4"+args[1]+"§c n'est pas connecté.");
 						return true;
 					}
-					LGGame game = LGPlayer.thePlayer(selected).getGame();
+					LGGame game = LGPlayer.thePlayer(instance, selected).getGame();
 					if(game == null) {
 						sender.sendMessage("§4Erreur : §cLe joueur §4"+selected.getName()+"§c n'est pas dans une partie.");
 						return true;
@@ -256,7 +255,7 @@ public class MainLg extends JavaPlugin{
 						sender.sendMessage("§4Erreur : §cLe joueur §4"+args[1]+"§c n'existe pas !");
 						return true;
 					}
-					LGPlayer lgp = LGPlayer.thePlayer(player);
+					LGPlayer lgp = LGPlayer.thePlayer(instance, player);
 					if(lgp.getGame() == null) {
 						sender.sendMessage("§4Erreur : §cLe joueur §4"+lgp.getName()+"§c n'est pas dans une partie.");
 						return true;
@@ -318,7 +317,7 @@ public class MainLg extends JavaPlugin{
 							String role = null;
 							if(args[2].length() <= 2)
 								try {
-									Integer i = Integer.valueOf(args[2]);
+									int i = Integer.parseInt(args[2]);
 									Object[] array = getRoles().keySet().toArray();
 									if(array.length <= i) {
 										sender.sendMessage(prefix+"§4Erreur: §cCe rôle n'existe pas.");
@@ -369,7 +368,7 @@ public class MainLg extends JavaPlugin{
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if(!sender.hasPermission("loupgarou.admin"))
-			return new ArrayList<String>(0);
+			return new ArrayList<>(0);
 		
 		if(args.length > 1) {
 			if(args[0].equalsIgnoreCase("roles"))
@@ -381,11 +380,11 @@ public class MainLg extends JavaPlugin{
 					return Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
 		}else if(args.length == 1)
 			return getStartingList(args[0], "addSpawn", "end", "start", "nextNight", "nextDay", "reloadConfig", "roles", "joinAll", "reloadPacks");
-		return new ArrayList<String>(0);
+		return new ArrayList<>(0);
 	}
 	private List<String> getStartingList(String startsWith, String... list){
 		startsWith = startsWith.toLowerCase();
-		ArrayList<String> returnlist = new ArrayList<String>();
+		ArrayList<String> returnlist = new ArrayList<>();
 		if(startsWith.length() == 0)
 			return Arrays.asList(list);
 		for(String s : list)
@@ -397,7 +396,7 @@ public class MainLg extends JavaPlugin{
 		int players = 0;
 		for(String role : roles.keySet())
 			players += getConfig().getInt("role."+role);
-		currentGame = new LGGame(players);
+		currentGame = new LGGame(this, players);
 	}
 	@Override
 	public void onDisable() {

@@ -2,6 +2,7 @@ package fr.leomelki.loupgarou.roles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -28,17 +29,16 @@ import fr.leomelki.loupgarou.MainLg;
 import fr.leomelki.loupgarou.classes.LGCustomItems;
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
 import fr.leomelki.loupgarou.events.LGPreDayStartEvent;
 import fr.leomelki.loupgarou.utils.VariousUtils;
 
 public class RPretre extends Role{
-	static ItemStack[] items = new ItemStack[9];
+	static final ItemStack[] items = new ItemStack[9];
 	static {
 		items[3] = new ItemStack(Material.IRON_NUGGET);
 		ItemMeta meta = items[3].getItemMeta();
 		meta.setDisplayName("§7§lNe rien faire");
-		meta.setLore(Arrays.asList("§8Passez votre tour"));
+		meta.setLore(Collections.singletonList("§8Passez votre tour"));
 		items[3].setItemMeta(meta);
 		items[5] = new ItemStack(Material.ROTTEN_FLESH);
 		meta = items[5].getItemMeta();
@@ -113,21 +113,21 @@ public class RPretre extends Role{
 		player.closeInventory();
 		player.openInventory(inventory);
 	}
-	WrappedDataWatcherObject invisible = new WrappedDataWatcherObject(0, WrappedDataWatcher.Registry.get(Byte.class));
+	final WrappedDataWatcherObject invisible = new WrappedDataWatcherObject(0, WrappedDataWatcher.Registry.get(Byte.class));
 	@Override
 	protected void onNightTurn(LGPlayer player, Runnable callback) {
 		player.showView();
 		for(LGPlayer lgp : getGame().getInGame())
 			if(lgp.isDead() && (lgp.getRoleType() == RoleType.VILLAGER || lgp.getRoleType() == player.getRoleType())){
 				if(lgp.getPlayer() != null) {
-					player.getPlayer().showPlayer(lgp.getPlayer());
+					player.getPlayer().showPlayer(getGame().getPlugin(), lgp.getPlayer());
 					WrapperPlayServerEntityMetadata meta = new WrapperPlayServerEntityMetadata();
 					meta.setEntityID(lgp.getPlayer().getEntityId());
-					meta.setMetadata(Arrays.asList(new WrappedWatchableObject(invisible, (byte)0)));
+					meta.setMetadata(Collections.singletonList(new WrappedWatchableObject(invisible, (byte) 0)));
 					meta.sendPacket(player.getPlayer());
 				}
 			}else
-				player.getPlayer().hidePlayer(lgp.getPlayer());
+				player.getPlayer().hidePlayer(getGame().getPlugin(), lgp.getPlayer());
 		this.callback = callback;
 		openInventory(player.getPlayer());
 	}
@@ -147,12 +147,12 @@ public class RPretre extends Role{
 		if(player.getPlayer() != null) {
 			for(LGPlayer lgp : getGame().getInGame())
 				if(lgp.getPlayer() != null && lgp != player)
-					player.getPlayer().hidePlayer(lgp.getPlayer());
+					player.getPlayer().hidePlayer(getGame().getPlugin(), lgp.getPlayer());
 		}
 	}
 
 	boolean inMenu = false;
-	ArrayList<LGPlayer> ressucited = new ArrayList<LGPlayer>();
+	final ArrayList<LGPlayer> ressucited = new ArrayList<>();
 	
 	private void closeInventory(Player p) {
 		inMenu = false;
@@ -162,7 +162,7 @@ public class RPretre extends Role{
 	public void onInventoryClick(InventoryClickEvent e) {
 		ItemStack item = e.getCurrentItem();
 		Player player = (Player)e.getWhoClicked();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 			
 		if(lgp.getRole() != this || item == null || item.getItemMeta() == null)return;
 
@@ -184,33 +184,29 @@ public class RPretre extends Role{
 			held.sendPacket(player);
 			lgp.sendMessage("§6Choisissez qui réssusciter.");
 			lgp.canSelectDead = true;
-			lgp.choose(new LGChooseCallback() {
-				
-				@Override
-				public void callback(LGPlayer choosen) {
-					if(choosen != null) {
-						if(!choosen.isDead())
-							lgp.sendMessage("§7§l"+choosen.getName()+"§c n'est pas mort.");
-						else if(lgp.getRoleType() == RoleType.LOUP_GAROU && choosen.getRoleType() == RoleType.NEUTRAL) {
-							lgp.sendMessage("§7§l"+choosen.getName()+"§c ne faisait ni partie du §a§lVillage§6 ni des §c§lLoups§6.");
-						}else if(lgp.getRoleType() != RoleType.LOUP_GAROU && choosen.getRoleType() != RoleType.VILLAGER) {
-							lgp.sendMessage("§7§l"+choosen.getName()+"§c ne faisait pas partie du §a§lVillage§6.");
-						} else {
-							player.getInventory().setItem(8, null);
-							player.updateInventory();
-							lgp.stopChoosing();
-							lgp.canSelectDead = false;
-							lgp.sendMessage("§6Tu as ramené §7§l"+choosen.getName()+"§6 à la vie.");
-							lgp.sendActionBarMessage("§7§l"+choosen.getName()+"§6 sera réssuscité");
-							
-							
-							ressucited.add(choosen);
-							getPlayers().remove(lgp);//Pour éviter qu'il puisse sauver plusieurs personnes.
-							choosen.sendMessage("§6Tu vas être réssuscité en tant que §a§lVillageois§6.");
-							hidePlayers(lgp);
-							lgp.hideView();
-							callback.run();
-						}
+			lgp.choose(choosen -> {
+				if(choosen != null) {
+					if(!choosen.isDead())
+						lgp.sendMessage("§7§l"+choosen.getName()+"§c n'est pas mort.");
+					else if(lgp.getRoleType() == RoleType.LOUP_GAROU && choosen.getRoleType() == RoleType.NEUTRAL) {
+						lgp.sendMessage("§7§l"+choosen.getName()+"§c ne faisait ni partie du §a§lVillage§6 ni des §c§lLoups§6.");
+					}else if(lgp.getRoleType() != RoleType.LOUP_GAROU && choosen.getRoleType() != RoleType.VILLAGER) {
+						lgp.sendMessage("§7§l"+choosen.getName()+"§c ne faisait pas partie du §a§lVillage§6.");
+					} else {
+						player.getInventory().setItem(8, null);
+						player.updateInventory();
+						lgp.stopChoosing();
+						lgp.canSelectDead = false;
+						lgp.sendMessage("§6Tu as ramené §7§l"+choosen.getName()+"§6 à la vie.");
+						lgp.sendActionBarMessage("§7§l"+choosen.getName()+"§6 sera réssuscité");
+
+
+						ressucited.add(choosen);
+						getPlayers().remove(lgp);//Pour éviter qu'il puisse sauver plusieurs personnes.
+						choosen.sendMessage("§6Tu vas être réssuscité en tant que §a§lVillageois§6.");
+						hidePlayers(lgp);
+						lgp.hideView();
+						callback.run();
 					}
 				}
 			}, lgp);
@@ -219,7 +215,7 @@ public class RPretre extends Role{
 	@EventHandler
 	public void onClick(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 		if(lgp.getRole() == this) {
 			if(e.getItem() != null && e.getItem().hasItemMeta() && e.getItem().getItemMeta().getDisplayName().equals(items[3].getItemMeta().getDisplayName())) {
 				e.setCancelled(true);
@@ -265,7 +261,7 @@ public class RPretre extends Role{
 
 					for(LGPlayer player : getGame().getInGame())
 						if(player.getPlayer() != null && player != lgp) {
-							player.getPlayer().showPlayer(lgp.getPlayer());
+							player.getPlayer().showPlayer(getGame().getPlugin(), lgp.getPlayer());
 						}
 				}
 				ressucited.clear();
@@ -274,7 +270,7 @@ public class RPretre extends Role{
 	@EventHandler
 	public void onQuitInventory(InventoryCloseEvent e) {
 		if(e.getInventory() instanceof CraftInventoryCustom) {
-			LGPlayer player = LGPlayer.thePlayer((Player)e.getPlayer());
+			LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), (Player)e.getPlayer());
 			if(player.getRole() == this && inMenu) {
 				new BukkitRunnable() {
 					

@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
 import fr.leomelki.loupgarou.events.LGNightPlayerPreKilledEvent;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
 import fr.leomelki.loupgarou.events.LGPreDayStartEvent;
@@ -59,30 +58,27 @@ public class RGarde extends Role{
 	protected void onNightTurn(LGPlayer player, Runnable callback) {
 		player.showView();
 		
-		player.choose(new LGChooseCallback() {
-			@Override
-			public void callback(LGPlayer choosen) {
-				if(choosen != null) {
-					LGPlayer lastProtected = player.getCache().get("garde_lastProtected");
-					if(choosen == lastProtected) {
-						if(lastProtected == player)
-							player.sendMessage("§4§oTu t'es déjà protégé la nuit dernière.");
-						else
-							player.sendMessage("§4§oTu as déjà protégé §7§l§o"+lastProtected.getName()+"§4§o la nuit dernière.");
-					}  else {
-						if(choosen == player) {
-							player.sendMessage("§6Tu décides de te protéger toi-même cette nuit.");
-							player.sendActionBarMessage("§9Tu seras protégé.");
-						} else {
-							player.sendMessage("§6Tu vas protéger §7§l"+choosen.getName()+"§6 cette nuit.");
-							player.sendActionBarMessage("§7§l"+choosen.getName()+"§9 sera protégé.");
-						}
-						choosen.getCache().set("garde_protected", true);
-						player.getCache().set("garde_lastProtected", choosen);
-						player.stopChoosing();
-						player.hideView();
-						callback.run();
+		player.choose(choosen -> {
+			if(choosen != null) {
+				LGPlayer lastProtected = player.getCache().get("garde_lastProtected");
+				if(choosen == lastProtected) {
+					if(lastProtected == player)
+						player.sendMessage("§4§oTu t'es déjà protégé la nuit dernière.");
+					else
+						player.sendMessage("§4§oTu as déjà protégé §7§l§o"+lastProtected.getName()+"§4§o la nuit dernière.");
+				}  else {
+					if(choosen == player) {
+						player.sendMessage("§6Tu décides de te protéger toi-même cette nuit.");
+						player.sendActionBarMessage("§9Tu seras protégé.");
+					} else {
+						player.sendMessage("§6Tu vas protéger §7§l"+choosen.getName()+"§6 cette nuit.");
+						player.sendActionBarMessage("§7§l"+choosen.getName()+"§9 sera protégé.");
 					}
+					choosen.getCache().set("garde_protected", true);
+					player.getCache().set("garde_lastProtected", choosen);
+					player.stopChoosing();
+					player.hideView();
+					callback.run();
 				}
 			}
 		});

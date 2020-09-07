@@ -5,7 +5,6 @@ import org.bukkit.event.EventPriority;
 
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
 import fr.leomelki.loupgarou.classes.LGWinType;
 import fr.leomelki.loupgarou.events.LGEndCheckEvent;
 import fr.leomelki.loupgarou.events.LGGameEndEvent;
@@ -61,17 +60,14 @@ public class RAssassin extends Role{
 	protected void onNightTurn(LGPlayer player, Runnable callback) {
 		player.showView();
 		
-		player.choose(new LGChooseCallback() {
-			@Override
-			public void callback(LGPlayer choosen) {
-				if(choosen != null && choosen != player) {
-					getGame().kill(choosen, Reason.ASSASSIN);
-					player.sendActionBarMessage("§e§l"+choosen.getName()+"§6 va mourir");
-					player.sendMessage("§6Tu as choisi de tuer §7§l"+choosen.getName()+"§6.");
-					player.stopChoosing();
-					player.hideView();
-					callback.run();
-				}
+		player.choose(choosen -> {
+			if(choosen != null && choosen != player) {
+				getGame().kill(choosen, Reason.ASSASSIN);
+				player.sendActionBarMessage("§e§l"+choosen.getName()+"§6 va mourir");
+				player.sendMessage("§6Tu as choisi de tuer §7§l"+choosen.getName()+"§6.");
+				player.stopChoosing();
+				player.hideView();
+				callback.run();
 			}
 		});
 	}

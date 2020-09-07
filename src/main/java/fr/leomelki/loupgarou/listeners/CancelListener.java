@@ -1,5 +1,6 @@
 package fr.leomelki.loupgarou.listeners;
 
+import fr.leomelki.loupgarou.MainLg;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,13 +18,18 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 import fr.leomelki.loupgarou.classes.LGPlayer;
 
 public class CancelListener implements Listener{
+	private final MainLg plugin;
+
+	public CancelListener (MainLg mainLg) {
+		this.plugin = mainLg;
+	}
 	@EventHandler
 	public void onPluie(WeatherChangeEvent e) {
 		e.setCancelled(true);
 	}
 	@EventHandler
 	public void onMove(PlayerMoveEvent e) {
-		LGPlayer lgp = LGPlayer.thePlayer(e.getPlayer());
+		LGPlayer lgp = LGPlayer.thePlayer(plugin, e.getPlayer());
 		if(lgp.getGame() != null && lgp.getGame().isStarted() && e.getFrom().distanceSquared(e.getTo()) > 0.001)
 			e.setTo(e.getFrom());
 	}
@@ -58,12 +64,12 @@ public class CancelListener implements Listener{
 	}
 	@EventHandler
 	public void onClickInventory(InventoryClickEvent e) {
-		if(LGPlayer.thePlayer((Player)e.getWhoClicked()).getGame() != null)
+		if(LGPlayer.thePlayer(plugin, (Player)e.getWhoClicked()).getGame() != null)
 			e.setCancelled(true);
 	}
 	@EventHandler
 	public void onClickInventory(PlayerSwapHandItemsEvent e) {
-		if(LGPlayer.thePlayer(e.getPlayer()).getGame() != null)
+		if(LGPlayer.thePlayer(plugin, e.getPlayer()).getGame() != null)
 			e.setCancelled(true);
 	}
 }

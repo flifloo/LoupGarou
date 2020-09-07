@@ -8,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
 import fr.leomelki.loupgarou.events.LGDayStartEvent;
-import fr.leomelki.loupgarou.events.LGEndCheckEvent;
 import fr.leomelki.loupgarou.events.LGGameEndEvent;
 import fr.leomelki.loupgarou.events.LGNightStart;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent;
@@ -60,9 +59,7 @@ public class RChasseur extends Role{
 		getGame().wait(getTimeout(), ()->{
 			this.onNightTurnTimeout(player);
 			callback.run();
-		}, (currentPlayer, secondsLeft)->{
-			return currentPlayer == player ? "§9§lC'est à ton tour !" : "§6Le Chasseur choisit sa cible (§e"+secondsLeft+" s§6)";
-		});
+		}, (currentPlayer, secondsLeft)-> currentPlayer == player ? "§9§lC'est à ton tour !" : "§6Le Chasseur choisit sa cible (§e"+secondsLeft+" s§6)");
 		getGame().broadcastMessage("§9"+getBroadcastedTask());
 		player.sendMessage("§6"+getTask());
 		//player.sendTitle("§6C'est à vous de jouer", "§a"+getTask(), 60);
@@ -88,7 +85,7 @@ public class RChasseur extends Role{
 		player.stopChoosing();
 	}
 	
-	ArrayList<LGPlayer> needToPlay = new ArrayList<LGPlayer>();
+	final ArrayList<LGPlayer> needToPlay = new ArrayList<>();
 	
 	@EventHandler
 	public void onPlayerKill(LGPlayerKilledEvent e) {

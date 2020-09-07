@@ -1,9 +1,6 @@
 package fr.leomelki.loupgarou.classes;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -42,11 +39,13 @@ import net.minecraft.server.v1_15_R1.PacketPlayOutRespawn;
 import net.minecraft.server.v1_15_R1.WorldType;
 
 public class LGPlayer {
-	private static final HashMap<Player, LGPlayer> cachedPlayers = new HashMap<Player, LGPlayer>();
-	public static LGPlayer thePlayer(Player player) {
+	private static final HashMap<Player, LGPlayer> cachedPlayers = new HashMap<>();
+	private final MainLg plugin;
+
+	public static LGPlayer thePlayer(MainLg plugin, Player player) {
 		LGPlayer lgp = cachedPlayers.get(player);
 		if(lgp == null) {
-			lgp = new LGPlayer(player);
+			lgp = new LGPlayer(plugin, player);
 			cachedPlayers.put(player, lgp);
 		}
 		return lgp;
@@ -64,10 +63,12 @@ public class LGPlayer {
 	@Getter @Setter private LGGame game;
 	@Getter @Setter private String latestObjective;
 	@Getter private CustomScoreboard scoreboard;
-	public LGPlayer(Player player) {
+	public LGPlayer(MainLg mainLg, Player player) {
+		this.plugin = mainLg;
 		this.player = player;
 	}
-	public LGPlayer(String name) {
+	public LGPlayer(MainLg mainLg, String name) {
+		this.plugin = mainLg;
 		this.name = name;
 	}
 	
@@ -139,7 +140,7 @@ public class LGPlayer {
 		return false;
 	}
 	public void choose(LGChooseCallback callback, LGPlayer... blacklisted) {
-		this.blacklistedChoice = blacklisted == null ? new ArrayList<LGPlayer>(0) : Arrays.asList(blacklisted);
+		this.blacklistedChoice = blacklisted == null ? new ArrayList<>(0) : Arrays.asList(blacklisted);
 		this.chooseCallback = callback;
 		//sendMessage("§7§oTIP: Regardez un joueur et tapez le afin de le sélectionner.");
 	}
@@ -157,17 +158,17 @@ public class LGPlayer {
 			for(LGPlayer lgp : getGame().getAlive())
 				if(!lgp.isDead()) {
 					if(lgp != this && lgp.getPlayer() != null)
-						getPlayer().showPlayer(lgp.getPlayer());
+						getPlayer().showPlayer(plugin, lgp.getPlayer());
 					else{
 						WrapperPlayServerScoreboardTeam team = new WrapperPlayServerScoreboardTeam();
 						team.setMode(2);
 						team.setName(lgp.getName());
 						team.setPrefix(WrappedChatComponent.fromText(""));
-						team.setPlayers(Arrays.asList(lgp.getName()));
+						team.setPlayers(Collections.singletonList(lgp.getName()));
 						team.sendPacket(getPlayer());
 						
 						WrapperPlayServerPlayerInfo info = new WrapperPlayServerPlayerInfo();
-						ArrayList<PlayerInfoData> infos = new ArrayList<PlayerInfoData>();
+						ArrayList<PlayerInfoData> infos = new ArrayList<>();
 						info.setAction(PlayerInfoAction.ADD_PLAYER);
 						infos.add(new PlayerInfoData(new WrappedGameProfile(getPlayer().getUniqueId(), getName()), 0, NativeGameMode.ADVENTURE, WrappedChatComponent.fromText(getName())));
 						info.setData(infos);
@@ -182,10 +183,10 @@ public class LGPlayer {
 	//TODO Update prefix for only one guy
 	public void updatePrefix() {
 		if(getGame() != null && !isDead() && player != null) {
-			List<String> meList = Arrays.asList(getName());
+			List<String> meList = Collections.singletonList(getName());
 			for(LGPlayer lgp : getGame().getInGame()) {
 				WrapperPlayServerPlayerInfo info = new WrapperPlayServerPlayerInfo();
-				ArrayList<PlayerInfoData> infos = new ArrayList<PlayerInfoData>();
+				ArrayList<PlayerInfoData> infos = new ArrayList<>();
 				info.setAction(PlayerInfoAction.ADD_PLAYER);
 				infos.add(new PlayerInfoData(new WrappedGameProfile(getPlayer().getUniqueId(), getName()), 0, NativeGameMode.ADVENTURE, WrappedChatComponent.fromText(getName())));
 				info.setData(infos);
@@ -203,13 +204,13 @@ public class LGPlayer {
 	public void hideView() {
 		if(getGame() != null && player != null) {
 			WrapperPlayServerPlayerInfo info = new WrapperPlayServerPlayerInfo();
-			ArrayList<PlayerInfoData> infos = new ArrayList<PlayerInfoData>();
+			ArrayList<PlayerInfoData> infos = new ArrayList<>();
 			info.setAction(PlayerInfoAction.ADD_PLAYER);
 			for(LGPlayer lgp : getGame().getAlive())
 				if(lgp != this && lgp.getPlayer() != null) {
 					if(!lgp.isDead())
 						infos.add(new PlayerInfoData(new WrappedGameProfile(lgp.getPlayer().getUniqueId(), lgp.getName()), 0, NativeGameMode.ADVENTURE, WrappedChatComponent.fromText(lgp.getName())));
-					getPlayer().hidePlayer(lgp.getPlayer());
+					getPlayer().hidePlayer(plugin, lgp.getPlayer());
 				}
 			info.setData(infos);
 			info.sendPacket(getPlayer());
@@ -224,14 +225,14 @@ public class LGPlayer {
 			for(LGPlayer lgp : getGame().getInGame()) {
 				if(lgp == this) {
 					WrapperPlayServerPlayerInfo info = new WrapperPlayServerPlayerInfo();
-					ArrayList<PlayerInfoData> infos = new ArrayList<PlayerInfoData>();
+					ArrayList<PlayerInfoData> infos = new ArrayList<>();
 					info.setAction(PlayerInfoAction.ADD_PLAYER);
 					infos.add(new PlayerInfoData(new WrappedGameProfile(getPlayer().getUniqueId(), getName()), 0, NativeGameMode.ADVENTURE, WrappedChatComponent.fromText(getName())));
 					info.setData(infos);
 					info.sendPacket(getPlayer());
 				}else if(!isDead() && lgp.getPlayer() != null){
-					lgp.getPlayer().hidePlayer(getPlayer());
-					lgp.getPlayer().showPlayer(getPlayer());
+					lgp.getPlayer().hidePlayer(plugin, getPlayer());
+					lgp.getPlayer().showPlayer(plugin, getPlayer());
 				}
 			}
 		}
@@ -242,7 +243,7 @@ public class LGPlayer {
 			WrapperPlayServerPlayerInfo infos = new WrapperPlayServerPlayerInfo();
 			infos.setAction(PlayerInfoAction.ADD_PLAYER);
 			WrappedGameProfile gameProfile = new WrappedGameProfile(getPlayer().getUniqueId(), getPlayer().getName());
-			infos.setData(Arrays.asList(new PlayerInfoData(gameProfile, 10, NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(getPlayer().getName()))));
+			infos.setData(Collections.singletonList(new PlayerInfoData(gameProfile, 10, NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(getPlayer().getName()))));
 			infos.sendPacket(getPlayer());
 			//Pour qu'il voit son skin changer (sa main et en f5), on lui dit qu'il respawn (alors qu'il n'est pas mort mais ça marche quand même mdr)
 			PacketPlayOutRespawn respawn = new PacketPlayOutRespawn(DimensionManager.OVERWORLD, 0, WorldType.NORMAL, EnumGamemode.ADVENTURE);
@@ -304,7 +305,7 @@ public class LGPlayer {
 		if(player != null)
 			for(LGPlayer lgp : getGame().getInGame())
 				if(lgp != this && lgp.getPlayer() != null)
-					lgp.getPlayer().hidePlayer(getPlayer());
+					lgp.getPlayer().hidePlayer(plugin, getPlayer());
 		muted = true;
 	}
 	public void resetMuted() {

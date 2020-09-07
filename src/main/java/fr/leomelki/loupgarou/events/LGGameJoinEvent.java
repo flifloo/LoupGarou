@@ -10,5 +10,6 @@ public class LGGameJoinEvent extends LGEvent{
 		this.player = player;
 	}
 
-	@Getter LGPlayer player;
+	@Getter
+    final LGPlayer player;
 }

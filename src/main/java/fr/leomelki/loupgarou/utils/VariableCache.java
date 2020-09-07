@@ -3,7 +3,7 @@ package fr.leomelki.loupgarou.utils;
 import java.util.HashMap;
 
 public class VariableCache {
-	private final HashMap<String, Object> cache = new HashMap<String, Object>();
+	private final HashMap<String, Object> cache = new HashMap<>();
 	public boolean getBoolean(String key) {
 		Object object = get(key);
 		return object != null && (boolean) object;

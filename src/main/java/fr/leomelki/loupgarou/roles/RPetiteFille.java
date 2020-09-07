@@ -50,7 +50,7 @@ public class RPetiteFille extends Role{
 		return -1;
 	}
 	
-	List<String> customNames = Arrays.asList("Loup Glouton", "Loup Méchant", "Loup Burlesque", "Loup Peureux", "Loup Malingre", "Loup Gentil", "Loup Tueur", "Loup Énervé", "Loup Docteur");
+	final List<String> customNames = Arrays.asList("Loup Glouton", "Loup Méchant", "Loup Burlesque", "Loup Peureux", "Loup Malingre", "Loup Gentil", "Loup Tueur", "Loup Énervé", "Loup Docteur");
 	
 	@EventHandler
 	public void onChangeRole(LGRoleTurnEndEvent e) {
@@ -61,9 +61,7 @@ public class RPetiteFille extends Role{
 						RLoupGarou lgRole = (RLoupGarou)role;
 						for(LGPlayer player : getPlayers())
 							if(!player.getCache().getBoolean("infected") && player.isRoleActive())
-								player.joinChat(lgRole.getChat(), (sender, message)->{
-									return "§c"+customNames.get(lgRole.getPlayers().indexOf(sender))+" §6» §f"+message;
-								}, true);
+								player.joinChat(lgRole.getChat(), (sender, message)-> "§c"+customNames.get(lgRole.getPlayers().indexOf(sender))+" §6» §f"+message, true);
 						break;
 					}
 			if(e.getPreviousRole() instanceof RLoupGarou)

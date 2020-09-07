@@ -11,7 +11,8 @@ public enum LGSound {
 	AMBIANT_NIGHT(Sound.MUSIC_DISC_MALL),
 	AMBIANT_DAY(Sound.MUSIC_DISC_MELLOHI);
 	
-	@Getter Sound sound;
+	@Getter
+    final Sound sound;
 	LGSound(Sound sound){
 		this.sound = sound;
 	}

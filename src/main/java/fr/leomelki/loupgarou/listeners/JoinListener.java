@@ -1,6 +1,6 @@
 package fr.leomelki.loupgarou.listeners;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -21,6 +21,11 @@ import fr.leomelki.loupgarou.classes.LGPlayer;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
 
 public class JoinListener implements Listener{
+	private final MainLg plugin;
+
+	public JoinListener(MainLg mainLg) {
+		this.plugin = mainLg;
+	}
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
@@ -29,17 +34,17 @@ public class JoinListener implements Listener{
 		WrapperPlayServerScoreboardTeam myTeam = new WrapperPlayServerScoreboardTeam();
 		myTeam.setName(p.getName());
 		myTeam.setPrefix(WrappedChatComponent.fromText(""));
-		myTeam.setPlayers(Arrays.asList(p.getName()));
+		myTeam.setPlayers(Collections.singletonList(p.getName()));
 		myTeam.setMode(0);
 		boolean noSpec = p.getGameMode() != GameMode.SPECTATOR;
 		for (Player player : Bukkit.getOnlinePlayers())
 			if (player != p) {
 				if (player.getGameMode() != GameMode.SPECTATOR)
-					player.hidePlayer(p);
+					player.hidePlayer(plugin, p);
 				WrapperPlayServerScoreboardTeam team = new WrapperPlayServerScoreboardTeam();
 				team.setName(player.getName());
 				team.setPrefix(WrappedChatComponent.fromText(""));
-				team.setPlayers(Arrays.asList(player.getName()));
+				team.setPlayers(Collections.singletonList(player.getName()));
 				team.setMode(0);
 
 				team.sendPacket(p);
@@ -49,7 +54,7 @@ public class JoinListener implements Listener{
 		if (e.getJoinMessage() == null || !e.getJoinMessage().equals("joinall")) {
 			//p.getPlayer().setResourcePack("http://leomelki.fr/mcgames/ressourcepacks/v32/loup_garou.zip");
 		} else {
-			LGPlayer lgp = LGPlayer.thePlayer(e.getPlayer());
+			LGPlayer lgp = LGPlayer.thePlayer(plugin, e.getPlayer());
 			lgp.showView();
 			lgp.join(MainLg.getInstance().getCurrentGame());
 		}
@@ -64,7 +69,7 @@ public class JoinListener implements Listener{
 	public void onResoucePack(PlayerResourcePackStatusEvent e) {
 		if (e.getStatus() == Status.SUCCESSFULLY_LOADED) {
 			Player p = e.getPlayer();
-			LGPlayer lgp = LGPlayer.thePlayer(p);
+			LGPlayer lgp = LGPlayer.thePlayer(plugin, p);
 			lgp.showView();
 			lgp.join(MainLg.getInstance().getCurrentGame());
 		} else if(e.getStatus() == Status.DECLINED || e.getStatus() == Status.FAILED_DOWNLOAD)
@@ -73,7 +78,7 @@ public class JoinListener implements Listener{
 	@EventHandler
 	public void onLeave(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
-		LGPlayer lgp = LGPlayer.thePlayer(p);
+		LGPlayer lgp = LGPlayer.thePlayer(plugin, p);
 		if(lgp.getGame() != null) {
 			lgp.leaveChat();
 			if(lgp.getRole() != null && !lgp.isDead())

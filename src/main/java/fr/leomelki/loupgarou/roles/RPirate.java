@@ -1,6 +1,7 @@
 package fr.leomelki.loupgarou.roles;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,17 +21,16 @@ import fr.leomelki.com.comphenix.packetwrapper.WrapperPlayServerHeldItemSlot;
 import fr.leomelki.loupgarou.MainLg;
 import fr.leomelki.loupgarou.classes.LGGame;
 import fr.leomelki.loupgarou.classes.LGPlayer;
-import fr.leomelki.loupgarou.classes.LGPlayer.LGChooseCallback;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
 
 public class RPirate extends Role{
-	static ItemStack[] items = new ItemStack[9];
+	static final ItemStack[] items = new ItemStack[9];
 	static {
 		items[3] = new ItemStack(Material.IRON_NUGGET);
 		ItemMeta meta = items[3].getItemMeta();
 		meta.setDisplayName("§7§lNe rien faire");
-		meta.setLore(Arrays.asList("§8Passez votre tour"));
+		meta.setLore(Collections.singletonList("§8Passez votre tour"));
 		items[3].setItemMeta(meta);
 		items[5] = new ItemStack(Material.ROTTEN_FLESH);
 		meta = items[5].getItemMeta();
@@ -124,7 +124,7 @@ public class RPirate extends Role{
 	public void onInventoryClick(InventoryClickEvent e) {
 		ItemStack item = e.getCurrentItem();
 		Player player = (Player)e.getWhoClicked();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 		
 		if(lgp.getRole() != this || item == null || item.getItemMeta() == null)return;
 
@@ -144,23 +144,19 @@ public class RPirate extends Role{
 			held.setSlot(0);
 			held.sendPacket(player);
 			lgp.sendMessage("§6Choisissez votre otage.");
-			lgp.choose(new LGChooseCallback() {
-				
-				@Override
-				public void callback(LGPlayer choosen) {
-					if(choosen != null) {
-						player.getInventory().setItem(8, null);
-						player.updateInventory();
-						lgp.stopChoosing();
-						lgp.sendMessage("§6Tu as pris §7§l"+choosen.getName()+"§6 en otage.");
-						lgp.sendActionBarMessage("§7§l"+choosen.getName()+"§6 est ton otage");
-						lgp.getCache().set("pirate_otage", choosen);
-						choosen.getCache().set("pirate_otage_d", lgp);
-						getPlayers().remove(lgp);//Pour éviter qu'il puisse prendre plusieurs otages
-						choosen.sendMessage("§7§l"+lgp.getName()+"§6 t'a pris en otage, il est "+getName()+"§6.");
-						lgp.hideView();
-						callback.run();
-					}
+			lgp.choose(choosen -> {
+				if(choosen != null) {
+					player.getInventory().setItem(8, null);
+					player.updateInventory();
+					lgp.stopChoosing();
+					lgp.sendMessage("§6Tu as pris §7§l"+choosen.getName()+"§6 en otage.");
+					lgp.sendActionBarMessage("§7§l"+choosen.getName()+"§6 est ton otage");
+					lgp.getCache().set("pirate_otage", choosen);
+					choosen.getCache().set("pirate_otage_d", lgp);
+					getPlayers().remove(lgp);//Pour éviter qu'il puisse prendre plusieurs otages
+					choosen.sendMessage("§7§l"+lgp.getName()+"§6 t'a pris en otage, il est "+getName()+"§6.");
+					lgp.hideView();
+					callback.run();
 				}
 			}, lgp);
 		}
@@ -181,7 +177,7 @@ public class RPirate extends Role{
 	@EventHandler
 	public void onClick(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 		if(lgp.getRole() == this) {
 			if(e.getItem() != null && e.getItem().hasItemMeta() && e.getItem().getItemMeta().getDisplayName().equals(items[3].getItemMeta().getDisplayName())) {
 				e.setCancelled(true);
@@ -197,7 +193,7 @@ public class RPirate extends Role{
 	@EventHandler
 	public void onQuitInventory(InventoryCloseEvent e) {
 		if(e.getInventory() instanceof CraftInventoryCustom) {
-			LGPlayer player = LGPlayer.thePlayer((Player)e.getPlayer());
+			LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), (Player)e.getPlayer());
 			if(player.getRole() == this && inMenu) {
 				new BukkitRunnable() {
 					

@@ -1,6 +1,7 @@
 package fr.leomelki.loupgarou.roles;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -70,12 +71,12 @@ public class RSurvivant extends Role{
 		inMenu = true;
 		Inventory inventory = Bukkit.createInventory(null, 9, "§7Veux-tu te protéger ?");
 		ItemStack[] items = new ItemStack[9];
-		VariableCache cache = LGPlayer.thePlayer(player).getCache();
+		VariableCache cache = LGPlayer.thePlayer(getGame().getPlugin(), player).getCache();
 		if(cache.<Integer>get("survivant_left") > 0) {
 			items[3] = new ItemStack(Material.IRON_NUGGET);
 			ItemMeta meta = items[3].getItemMeta();
 			meta.setDisplayName("§7§lNe rien faire");
-			meta.setLore(Arrays.asList("§8Passez votre tour"));
+			meta.setLore(Collections.singletonList("§8Passez votre tour"));
 			items[3].setItemMeta(meta);
 			items[5] = new ItemStack(Material.GOLD_NUGGET);
 			meta = items[5].getItemMeta();
@@ -88,7 +89,7 @@ public class RSurvivant extends Role{
 			items[4] = new ItemStack(Material.IRON_NUGGET);
 			ItemMeta meta = items[4].getItemMeta();
 			meta.setDisplayName("§7§lNe rien faire");
-			meta.setLore(Arrays.asList("§8Passez votre tour"));
+			meta.setLore(Collections.singletonList("§8Passez votre tour"));
 			items[4].setItemMeta(meta);
 		}
 		player.closeInventory();
@@ -123,7 +124,7 @@ public class RSurvivant extends Role{
 	public void onInventoryClick(InventoryClickEvent e) {
 		ItemStack item = e.getCurrentItem();
 		Player player = (Player)e.getWhoClicked();
-		LGPlayer lgp = LGPlayer.thePlayer(player);
+		LGPlayer lgp = LGPlayer.thePlayer(getGame().getPlugin(), player);
 			
 		if(lgp.getRole() != this || item == null || item.getItemMeta() == null)return;
 
@@ -167,7 +168,7 @@ public class RSurvivant extends Role{
 	@EventHandler
 	public void onQuitInventory(InventoryCloseEvent e) {
 		if(e.getInventory() instanceof CraftInventoryCustom) {
-			LGPlayer player = LGPlayer.thePlayer((Player)e.getPlayer());
+			LGPlayer player = LGPlayer.thePlayer(getGame().getPlugin(), (Player)e.getPlayer());
 			if(player.getRole() == this && inMenu) {
 				new BukkitRunnable() {
 					

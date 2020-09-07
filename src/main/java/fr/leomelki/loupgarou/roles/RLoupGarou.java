@@ -71,9 +71,7 @@ public class RLoupGarou extends Role{
 		return 30;
 	}
 	
-	@Getter private final LGChat chat = new LGChat((sender, message) -> {
-		return "§c"+sender.getName()+" §6» §f"+message;
-	});
+	@Getter private final LGChat chat = new LGChat((sender, message) -> "§c"+sender.getName()+" §6» §f"+message);
 
 	boolean showSkins = false;
 	LGVote vote;
@@ -86,9 +84,7 @@ public class RLoupGarou extends Role{
 	}
 
 	public void onNightTurn(Runnable callback) {
-		vote = new LGVote(getTimeout(), getTimeout()/3, getGame(), false, false, (player, secondsLeft)-> {
-			return !getPlayers().contains(player) ? "§6C'est au tour "+getFriendlyName()+" §6(§e"+secondsLeft+" s§6)" : player.getCache().has("vote") ? "§l§9Vous votez contre §c§l"+player.getCache().<LGPlayer>get("vote").getName() : "§6Il vous reste §e"+secondsLeft+" seconde"+(secondsLeft > 1 ? "s" : "")+"§6 pour voter";
-		});
+		vote = new LGVote(getTimeout(), getTimeout()/3, getGame(), false, false, (player, secondsLeft)-> !getPlayers().contains(player) ? "§6C'est au tour "+getFriendlyName()+" §6(§e"+secondsLeft+" s§6)" : player.getCache().has("vote") ? "§l§9Vous votez contre §c§l"+player.getCache().<LGPlayer>get("vote").getName() : "§6Il vous reste §e"+secondsLeft+" seconde"+(secondsLeft > 1 ? "s" : "")+"§6 pour voter");
 		for(LGPlayer lgp : getGame().getAlive())
 			if(lgp.getRoleType() == RoleType.LOUP_GAROU)
 				lgp.showView();
@@ -124,7 +120,7 @@ public class RLoupGarou extends Role{
 						equal = true;
 				if(equal) {
 					choosen = null;
-					ArrayList<LGPlayer> choosable = new ArrayList<LGPlayer>();
+					ArrayList<LGPlayer> choosable = new ArrayList<>();
 					for(Entry<LGPlayer, List<LGPlayer>> entry : vote.getVotes().entrySet())
 						if(entry.getValue().size() == max && entry.getKey().getRoleType() != RoleType.LOUP_GAROU)
 							choosable.add(entry.getKey());
