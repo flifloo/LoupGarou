@@ -212,7 +212,7 @@ public class MainLg extends JavaPlugin{
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(label.equalsIgnoreCase("lg")) {
+		if(label.equalsIgnoreCase("ww")) {
 			if(!sender.hasPermission("loupgarou.admin")) {
 				sender.sendMessage(prefix+"§4Erreur: Vous n'avez pas la permission...");
 				return true;
