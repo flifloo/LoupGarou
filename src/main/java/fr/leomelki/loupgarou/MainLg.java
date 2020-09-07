@@ -87,8 +87,8 @@ import lombok.Setter;
 
 public class MainLg extends JavaPlugin{
 	private static MainLg instance;
-	@Getter private HashMap<String, Constructor<? extends Role>> roles = new HashMap<String, Constructor<? extends Role>>();
-	@Getter private static String prefix = ""/*"§7[§9Loup-Garou§7] "*/;
+	@Getter private final HashMap<String, Constructor<? extends Role>> roles = new HashMap<String, Constructor<? extends Role>>();
+	@Getter private static final String prefix = ""/*"§7[§9Loup-Garou§7] "*/;
 	
 	@Getter @Setter private LGGame currentGame;//Because for now, only one game will be playable on one server (flemme)
 	

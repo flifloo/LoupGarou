@@ -82,7 +82,7 @@ public class RVampire extends Role{
 		return nextCanInfect < getGame().getNight() && super.hasPlayersLeft();
 	}
 	
-	@Getter private LGChat chat = new LGChat((sender, message) -> {
+	@Getter private final LGChat chat = new LGChat((sender, message) -> {
 		return "§5"+sender.getName()+" §6» §f"+message;
 	});
 	int nextCanInfect = 0;

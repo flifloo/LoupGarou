@@ -21,5 +21,5 @@ public enum RoleSort {
 	Pirate,
 	Bouffon,
 	Sorciere,
-	Corbeau;
+	Corbeau
 }

@@ -29,8 +29,8 @@ import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
 import fr.leomelki.loupgarou.events.LGVoteEvent;
 
 public class RDictateur extends Role{
-	static private ItemStack[] items = new ItemStack[9];
-	static private Inventory inventory;
+	static private final ItemStack[] items = new ItemStack[9];
+	static private final Inventory inventory;
 	static {
 		items[3] = new ItemStack(Material.IRON_NUGGET);
 		ItemMeta meta = items[3].getItemMeta();

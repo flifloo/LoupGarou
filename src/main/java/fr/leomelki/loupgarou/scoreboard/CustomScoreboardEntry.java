@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class CustomScoreboardEntry {
-	private static WrappedChatComponent nullComponent = WrappedChatComponent.fromText("");
+	private static final WrappedChatComponent nullComponent = WrappedChatComponent.fromText("");
 	
 	//setter car flemme de modifier le systeme pour le rendre plus logique
 	@Getter @Setter private int score;

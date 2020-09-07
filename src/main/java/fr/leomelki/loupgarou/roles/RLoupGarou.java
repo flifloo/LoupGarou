@@ -71,7 +71,7 @@ public class RLoupGarou extends Role{
 		return 30;
 	}
 	
-	@Getter private LGChat chat = new LGChat((sender, message) -> {
+	@Getter private final LGChat chat = new LGChat((sender, message) -> {
 		return "§c"+sender.getName()+" §6» §f"+message;
 	});
 

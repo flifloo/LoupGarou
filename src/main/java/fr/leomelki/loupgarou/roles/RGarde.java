@@ -96,7 +96,7 @@ public class RGarde extends Role{
 		//player.sendMessage("§cVous n'avez protégé personne cette nuit.");
 	}
 	
-	private static List<Reason> reasonsProtected = Arrays.asList(Reason.LOUP_GAROU, Reason.LOUP_BLANC, Reason.GM_LOUP_GAROU, Reason.ASSASSIN);
+	private static final List<Reason> reasonsProtected = Arrays.asList(Reason.LOUP_GAROU, Reason.LOUP_BLANC, Reason.GM_LOUP_GAROU, Reason.ASSASSIN);
 	
 	@EventHandler
 	public void onPlayerKill(LGNightPlayerPreKilledEvent e) {

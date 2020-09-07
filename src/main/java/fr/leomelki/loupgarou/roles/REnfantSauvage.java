@@ -80,7 +80,7 @@ public class REnfantSauvage extends Role{
 			}
 		}, player);
 	}
-	private static Random random = new Random();
+	private static final Random random = new Random();
 	@Override
 	protected void onNightTurnTimeout(LGPlayer player) {
 		player.stopChoosing();

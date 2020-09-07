@@ -24,8 +24,8 @@ import fr.leomelki.loupgarou.classes.LGPlayer;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
 
 public class RSorciere extends Role{
-	private static ItemStack[] items = new ItemStack[4];
-	private static ItemStack cancel;
+	private static final ItemStack[] items = new ItemStack[4];
+	private static final ItemStack cancel;
 	static {
 		items[0] = new ItemStack(Material.PURPLE_DYE, 1);
 		ItemMeta meta = items[0].getItemMeta();

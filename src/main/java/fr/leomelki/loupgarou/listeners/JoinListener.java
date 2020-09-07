@@ -25,30 +25,30 @@ public class JoinListener implements Listener{
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
-		
+
 		WrapperPlayServerScoreboardTeam myTeam = new WrapperPlayServerScoreboardTeam();
 		myTeam.setName(p.getName());
 		myTeam.setPrefix(WrappedChatComponent.fromText(""));
 		myTeam.setPlayers(Arrays.asList(p.getName()));
 		myTeam.setMode(0);
 		boolean noSpec = p.getGameMode() != GameMode.SPECTATOR;
-		for(Player player : Bukkit.getOnlinePlayers())
-			if(player != p) {
-				if(player.getGameMode() != GameMode.SPECTATOR)
+		for (Player player : Bukkit.getOnlinePlayers())
+			if (player != p) {
+				if (player.getGameMode() != GameMode.SPECTATOR)
 					player.hidePlayer(p);
 				WrapperPlayServerScoreboardTeam team = new WrapperPlayServerScoreboardTeam();
 				team.setName(player.getName());
 				team.setPrefix(WrappedChatComponent.fromText(""));
 				team.setPlayers(Arrays.asList(player.getName()));
 				team.setMode(0);
-				
+
 				team.sendPacket(p);
 				myTeam.sendPacket(player);
 			}
 		p.setFoodLevel(6);
-		if(e.getJoinMessage() == null || !e.getJoinMessage().equals("joinall"))
+		if (e.getJoinMessage() == null || !e.getJoinMessage().equals("joinall")) {
 			p.getPlayer().setResourcePack("http://leomelki.fr/mcgames/ressourcepacks/v32/loup_garou.zip");
-		else {
+		} else {
 			LGPlayer lgp = LGPlayer.thePlayer(e.getPlayer());
 			lgp.showView();
 			lgp.join(MainLg.getInstance().getCurrentGame());
@@ -62,12 +62,12 @@ public class JoinListener implements Listener{
 	}
 	@EventHandler
 	public void onResoucePack(PlayerResourcePackStatusEvent e) {
-		if(e.getStatus() == Status.SUCCESSFULLY_LOADED) {
+		if (e.getStatus() == Status.SUCCESSFULLY_LOADED) {
 			Player p = e.getPlayer();
 			LGPlayer lgp = LGPlayer.thePlayer(p);
 			lgp.showView();
 			lgp.join(MainLg.getInstance().getCurrentGame());
-		}else if(e.getStatus() == Status.DECLINED || e.getStatus() == Status.FAILED_DOWNLOAD)
+		} else if(e.getStatus() == Status.DECLINED || e.getStatus() == Status.FAILED_DOWNLOAD)
 			e.getPlayer().kickPlayer(MainLg.getPrefix()+"§cIl vous faut le resourcepack pour jouer ! ("+e.getStatus()+")");
 	}
 	@EventHandler

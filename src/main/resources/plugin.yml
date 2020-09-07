@@ -5,4 +5,4 @@ main: fr.leomelki.loupgarou.MainLg
 depend: [ProtocolLib]
 api-version: 1.13
 commands:
-  lg:
+  ww:

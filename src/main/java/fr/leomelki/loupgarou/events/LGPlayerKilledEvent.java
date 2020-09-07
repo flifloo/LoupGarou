@@ -21,7 +21,7 @@ public class LGPlayerKilledEvent extends LGEvent implements Cancellable{
     @Getter @Setter private Reason reason;
 	
     @RequiredArgsConstructor
-	public static enum Reason{
+	public enum Reason{
 		LOUP_GAROU("§7§l%s§4 est mort pendant la nuit"),
 		GM_LOUP_GAROU("§7§l%s§4 est mort pendant la nuit"),
 		LOUP_BLANC(LOUP_GAROU.getMessage()),

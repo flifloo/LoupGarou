@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class MultipleValueMap<K, V> {
-	private HashMap<K, List<V>> map = new HashMap<>();
+	private final HashMap<K, List<V>> map = new HashMap<>();
 	public void put(K key, V value) {
 		List<V> list = map.get(key);
 		if(list == null)
@@ -56,7 +56,7 @@ public class MultipleValueMap<K, V> {
 	@AllArgsConstructor
 	public static class MultipleValueKeyEntry<K, V> implements Entry<K, V>{
 		@Getter
-		private K key;
+		private final K key;
 		@Getter
 		private V value;
 		@Override

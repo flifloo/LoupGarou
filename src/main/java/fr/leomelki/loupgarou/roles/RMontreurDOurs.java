@@ -55,7 +55,7 @@ public class RMontreurDOurs extends Role{
 		return -1;
 	}
 	
-	private static Random random = new Random();
+	private static final Random random = new Random();
 	private int lastNight = -1;
 
 	@EventHandler(priority = EventPriority.LOWEST)

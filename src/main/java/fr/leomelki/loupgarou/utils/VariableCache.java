@@ -3,10 +3,10 @@ package fr.leomelki.loupgarou.utils;
 import java.util.HashMap;
 
 public class VariableCache {
-	private HashMap<String, Object> cache = new HashMap<String, Object>();
+	private final HashMap<String, Object> cache = new HashMap<String, Object>();
 	public boolean getBoolean(String key) {
 		Object object = get(key);
-		return object == null ? false : (boolean)object;
+		return object != null && (boolean) object;
 	}
 	public void set(String key, Object value) {
 		if(cache.containsKey(key))

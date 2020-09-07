@@ -70,13 +70,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class LGGame implements Listener{
-	private static boolean autoStart = false;
+	private static final boolean autoStart = false;
 	
 	
 	@Getter private final SecureRandom random = new SecureRandom();
 	@Getter private final int maxPlayers;
-	@Getter private ArrayList<LGPlayer> inGame = new ArrayList<LGPlayer>();
-	@Getter private ArrayList<Role> roles = new ArrayList<Role>();
+	@Getter private final ArrayList<LGPlayer> inGame = new ArrayList<LGPlayer>();
+	@Getter private final ArrayList<Role> roles = new ArrayList<Role>();
 	
 	@Getter private boolean started;
 	@Getter private int night = 0;
@@ -84,12 +84,12 @@ public class LGGame implements Listener{
 	@Getter @Setter private int waitTicks;
 	@Getter private boolean day;
 	@Getter public long time = 0;
-	@Getter private HashMap<Integer, LGPlayer> placements = new HashMap<Integer, LGPlayer>();
+	@Getter private final HashMap<Integer, LGPlayer> placements = new HashMap<Integer, LGPlayer>();
 	
-	@Getter private LGChat spectatorChat = new LGChat((sender, message) -> {
+	@Getter private final LGChat spectatorChat = new LGChat((sender, message) -> {
 		return "§7"+sender.getName()+" §6» §f"+message;
 	});
-	@Getter private LGChat dayChat = new LGChat((sender, message) -> {
+	@Getter private final LGChat dayChat = new LGChat((sender, message) -> {
 		return "§e"+sender.getName()+" §6» §f"+message;
 	});
 	
@@ -100,7 +100,7 @@ public class LGGame implements Listener{
 	}
 	
 	@Getter
-	private MultipleValueMap<LGPlayerKilledEvent.Reason, LGPlayer> deaths = new MultipleValueMap<LGPlayerKilledEvent.Reason, LGPlayer>();
+	private final MultipleValueMap<LGPlayerKilledEvent.Reason, LGPlayer> deaths = new MultipleValueMap<LGPlayerKilledEvent.Reason, LGPlayer>();
 
 	public void sendActionBarMessage(String msg) {
 		WrapperPlayServerChat chat = new WrapperPlayServerChat();
@@ -173,8 +173,8 @@ public class LGGame implements Listener{
 		}.runTaskTimer(MainLg.getInstance(), 0, 1);
 	}
 	
-	public static interface TextGenerator{
-		public String generate(LGPlayer player, int secondsLeft);
+	public interface TextGenerator{
+		String generate(LGPlayer player, int secondsLeft);
 	}
 	public void cancelWait() {
 		if(waitTask != null) {
@@ -551,8 +551,7 @@ public class LGGame implements Listener{
 			killed.getPlayer().getWorld().strikeLightningEffect(killed.getPlayer().getLocation());
 			
 			for(Role role : getRoles())
-				if(role.getPlayers().contains(killed))
-					role.getPlayers().remove(killed);
+				role.getPlayers().remove(killed);
 	
 			killed.setDead(true);
 			

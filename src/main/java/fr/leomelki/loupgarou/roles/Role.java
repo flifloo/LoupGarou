@@ -17,7 +17,7 @@ import lombok.Setter;
 
 public abstract class Role implements Listener{
 	@Getter @Setter private int waitedPlayers;
-	@Getter private ArrayList<LGPlayer> players = new ArrayList<LGPlayer>();
+	@Getter private final ArrayList<LGPlayer> players = new ArrayList<LGPlayer>();
 	@Getter private final LGGame game;
 	
 	public Role(LGGame game) {

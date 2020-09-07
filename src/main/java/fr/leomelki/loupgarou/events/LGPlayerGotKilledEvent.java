@@ -15,6 +15,6 @@ public class LGPlayerGotKilledEvent extends LGEvent {
 	
 	@Getter private final boolean endGame;
     @Getter private final LGPlayer killed;
-    @Getter private Reason reason;
+    @Getter private final Reason reason;
 	
 }

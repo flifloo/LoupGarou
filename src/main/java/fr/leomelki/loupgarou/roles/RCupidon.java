@@ -223,7 +223,7 @@ public class RCupidon extends Role{
 						if(!e.getWinners().contains(lgp))
 							e.getWinners().add(lgp);
 					} else {
-						LGPlayer player2 = lgp.getCache().<LGPlayer>get("inlove");
+						LGPlayer player2 = lgp.getCache().get("inlove");
 						boolean winEnCouple = (lgp.getRoleType() == RoleType.LOUP_GAROU) != (player2.getRoleType() == RoleType.LOUP_GAROU) || lgp.getRoleWinType() == RoleWinType.SEUL || player2.getRoleWinType() == RoleWinType.SEUL;
 						if(winEnCouple) {
 							System.out.println(lgp.getName()+" ne peut pas gagner car il était en couple !");

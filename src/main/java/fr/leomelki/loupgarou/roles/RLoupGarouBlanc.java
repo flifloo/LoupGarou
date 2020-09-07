@@ -19,7 +19,7 @@ import fr.leomelki.loupgarou.events.LGGameEndEvent;
 import fr.leomelki.loupgarou.events.LGPlayerKilledEvent.Reason;
 
 public class RLoupGarouBlanc extends Role{
-	private static ItemStack skip;
+	private static final ItemStack skip;
 	static {
 		skip = new ItemStack(Material.IRON_NUGGET);
 		ItemMeta meta = skip.getItemMeta();

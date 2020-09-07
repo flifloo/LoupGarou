@@ -130,7 +130,7 @@ public class RPyromane extends Role{
 	@Override
 	protected void onNightTurnTimeout(LGPlayer player) {
 		if(first != null) {
-			List<LGPlayer> liste = player.getCache().<List<LGPlayer>>get("pyromane_essence");
+			List<LGPlayer> liste = player.getCache().get("pyromane_essence");
 			LGPyromaneGasoilEvent event = new LGPyromaneGasoilEvent(getGame(), first);
 			Bukkit.getPluginManager().callEvent(event);
 			if(event.isCancelled())
@@ -172,7 +172,7 @@ public class RPyromane extends Role{
 			e.setCancelled(true);
 			closeInventory(player);
 			if(lgp.getCache().<List<LGPlayer>>get("pyromane_essence").size() != 0) {
-				List<LGPlayer> liste = lgp.getCache().<List<LGPlayer>>get("pyromane_essence");
+				List<LGPlayer> liste = lgp.getCache().get("pyromane_essence");
 				for(LGPlayer scndPlayer : liste) {
 					if(!scndPlayer.isDead() && scndPlayer.getPlayer() != null) {
 						getGame().kill(scndPlayer, Reason.PYROMANE);
@@ -203,7 +203,7 @@ public class RPyromane extends Role{
 							lgp.sendMessage("§cTu as déjà versé du gasoil sur §7§l"+choosen.getName()+"§6.");
 							return;
 						}
-						List<LGPlayer> liste = lgp.getCache().<List<LGPlayer>>get("pyromane_essence");
+						List<LGPlayer> liste = lgp.getCache().get("pyromane_essence");
 						if(liste.contains(choosen)) {
 							lgp.sendMessage("§7§l"+choosen.getName()+"§c est déjà recouvert de gasoil.");
 							return;
@@ -266,9 +266,9 @@ public class RPyromane extends Role{
 		if(e.getGame() == getGame())
 			for(LGPlayer lgp : getPlayers())
 				if(lgp.getCache().has("pyromane_essence")) {
-					List<LGPlayer> liste = lgp.getCache().<List<LGPlayer>>get("pyromane_essence");
-					if(liste.contains(e.getKilled()))//Au cas où le mec soit rez
-						liste.remove(e.getKilled());
+					List<LGPlayer> liste = lgp.getCache().get("pyromane_essence");
+					//Au cas où le mec soit rez
+					liste.remove(e.getKilled());
 				}
 	}
 	@EventHandler

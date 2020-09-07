@@ -54,7 +54,7 @@ public class RFaucheur extends Role{
 		return -1;
 	}
 	
-	private static Random random = new Random();
+	private static final Random random = new Random();
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onKill(LGPlayerKilledEvent e) {

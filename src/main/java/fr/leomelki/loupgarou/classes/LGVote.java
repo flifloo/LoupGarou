@@ -44,7 +44,9 @@ import net.minecraft.server.v1_15_R1.PacketPlayOutEntityMetadata;
 
 public class LGVote {
 	@Getter LGPlayer choosen;
-	private int timeout, initialTimeout, littleTimeout;
+	private int timeout;
+	private final int initialTimeout;
+	private final int littleTimeout;
 	private Runnable callback;
 	private final LGGame game;
 	@Getter private List<LGPlayer> participants, viewers;

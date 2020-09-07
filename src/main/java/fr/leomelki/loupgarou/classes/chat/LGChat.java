@@ -12,9 +12,9 @@ public class LGChat {
 	@Getter private final HashMap<LGPlayer, LGChatCallback> viewers = new HashMap<LGPlayer, LGChatCallback>();
 	@Getter private final LGChatCallback defaultCallback;
 	
-	public static interface LGChatCallback{
-		public String receive(LGPlayer sender, String message);
-		public default String send(LGPlayer sender, String message) {return null;};
+	public interface LGChatCallback{
+		String receive(LGPlayer sender, String message);
+		default String send(LGPlayer sender, String message) {return null;}
 	}
 
 	public void sendMessage(LGPlayer sender, String message) {

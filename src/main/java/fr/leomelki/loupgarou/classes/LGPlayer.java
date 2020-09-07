@@ -42,7 +42,7 @@ import net.minecraft.server.v1_15_R1.PacketPlayOutRespawn;
 import net.minecraft.server.v1_15_R1.WorldType;
 
 public class LGPlayer {
-	private static HashMap<Player, LGPlayer> cachedPlayers = new HashMap<Player, LGPlayer>();
+	private static final HashMap<Player, LGPlayer> cachedPlayers = new HashMap<Player, LGPlayer>();
 	public static LGPlayer thePlayer(Player player) {
 		LGPlayer lgp = cachedPlayers.get(player);
 		if(lgp == null) {
@@ -60,7 +60,7 @@ public class LGPlayer {
 	@Setter @Getter private Role role;
 	private LGChooseCallback chooseCallback;
 	private List<LGPlayer> blacklistedChoice = new ArrayList<>(0);
-	@Getter private VariableCache cache = new VariableCache();
+	@Getter private final VariableCache cache = new VariableCache();
 	@Getter @Setter private LGGame game;
 	@Getter @Setter private String latestObjective;
 	@Getter private CustomScoreboard scoreboard;
@@ -148,8 +148,8 @@ public class LGPlayer {
 		this.chooseCallback = null;
 	}
 	
-	public static interface LGChooseCallback{
-		public void callback(LGPlayer choosen);
+	public interface LGChooseCallback{
+		void callback(LGPlayer choosen);
 	}
 
 	public void showView() {
